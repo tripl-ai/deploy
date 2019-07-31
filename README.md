@@ -1,0 +1,1 @@
+These are example [Terraform](https://www.terraform.io/) scripts to demonstrate how to execute Arc against a remote cluster.
