@@ -19,10 +19,26 @@ data "aws_ami" "amzn2-ami-ecs-hvm" {
   }
 }
 
+data "template_file" "user_data_null" {
+  template = file("${path.module}/templates/user-data-null.sh")
+  vars = {}
+}
+
+data "template_file" "user_data_single_ssd" {
+  template = file("${path.module}/templates/user-data-single-ssd.sh")
+  vars = {}
+}
+
+data "template_file" "user_data_raid0_ssd" {
+  template = file("${path.module}/templates/user-data-raid0-ssd.sh")
+  vars = {}
+}
+
 resource "aws_instance" "arc_driver" {
   ami                         = "${data.aws_ami.amzn2-ami-ecs-hvm.id}"
   instance_type               = "${var.driver_instance_type}"
   key_name                    = "${var.key_name}"
+  user_data                   = "${data.template_file.user_data_null.rendered}"
   associate_public_ip_address = true
 
   tags = {
