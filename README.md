@@ -3,4 +3,4 @@ These are example [Terraform](https://www.terraform.io/) scripts to demonstrate 
 For AWS:
 
 - [aws-single-master](https://github.com/tripl-ai/deploy/tree/master/aws-single-master) for a single instance. 
-- [aws-cluster](https://github.com/tripl-ai/deploy/tree/master/aws-cluster) for a mulit-instance cluster.
+- [aws-cluster](https://github.com/tripl-ai/deploy/tree/master/aws-cluster) for a multi-instance cluster.
