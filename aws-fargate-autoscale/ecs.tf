@@ -8,12 +8,14 @@ data "template_file" "arc_app" {
   template = file("./templates/ecs/arc_app.json.tpl")
 
   vars = {
-    container_name = var.container_name
-    app_image      = var.app_image
-    app_port       = var.app_port
-    fargate_cpu    = var.fargate_cpu
-    fargate_memory = var.fargate_memory
-    aws_region     = var.aws_region
+    container_name    = var.container_name
+    app_image         = var.app_image
+    app_port          = var.app_port
+    fargate_cpu       = var.fargate_cpu
+    fargate_memory    = var.fargate_memory
+    aws_region        = var.aws_region
+    access_key_arn    = var.access_key_arn
+    access_secret_arn = var.access_secret_arn
   }
 }
 
@@ -41,10 +43,15 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.app.id
+    target_group_arn = aws_alb_target_group.web.id
     container_name   = var.container_name
     container_port   = var.app_port
   }
 
-  depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_role]
+  load_balancer {
+    target_group_arn = aws_alb_target_group.spark.id
+    container_name   = var.container_name
+    container_port   = 4040
+  }
+  depends_on = [aws_alb_listener.web, aws_alb_listener.spark, aws_iam_role_policy_attachment.ecs_task_execution_role]
 }

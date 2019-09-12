@@ -12,12 +12,22 @@ resource "aws_security_group" "lb" {
     to_port     = var.app_port
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    protocol    = "tcp"
+    from_port   = 4040
+    to_port     = 4040
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "arc-load-balancer-sg"
   }
 }
 
@@ -33,6 +43,12 @@ resource "aws_security_group" "ecs_tasks" {
     to_port         = var.app_port
     security_groups = [aws_security_group.lb.id]
   }
+  ingress {
+    protocol        = "tcp"
+    from_port       = 4040
+    to_port         = 4040
+    security_groups = [aws_security_group.lb.id]
+  }
 
   egress {
     protocol    = "-1"
@@ -40,4 +56,9 @@ resource "aws_security_group" "ecs_tasks" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "arc-ecs-tasks-sg"
+  }
+
 }

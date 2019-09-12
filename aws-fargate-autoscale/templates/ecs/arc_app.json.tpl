@@ -33,8 +33,18 @@
      "environment": [
         {
           "name": "JAVA_OPTS",
-          "value": "-Xmx5g"
+          "value": "-Xmx10g"
         }
-     ]
+    ],
+    "secrets": [
+        {
+            "name": "ETL_CONF_AWS_ACCESS_KEY",
+            "valueFrom": "${access_key_arn}"          
+        },
+        {
+            "name": "ETL_CONF_AWS_ACCESS_SECRET",
+            "valueFrom": "${access_secret_arn}"          
+        }
+    ]
   }
 ]
