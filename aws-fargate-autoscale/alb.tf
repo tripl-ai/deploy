@@ -8,7 +8,7 @@ resource "aws_alb" "main" {
 
 resource "aws_alb_target_group" "web" {
   name        = "jupyter-target-group"
-  port        = 8888
+  port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
@@ -25,7 +25,7 @@ resource "aws_alb_target_group" "web" {
 }
 resource "aws_alb_target_group" "spark" {
   name        = "spark-target-group"
-  port        = 8888
+  port        = 4040
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
@@ -38,6 +38,7 @@ resource "aws_alb_target_group" "spark" {
     timeout             = "5"
     path                = var.health_check_path
     unhealthy_threshold = "2"
+    port                = var.app_port
   }
 
   depends_on = [aws_alb_listener.web]

@@ -1,0 +1,6 @@
+version: 1
+task_definition:
+  services:
+    arc-jupyter:
+      cpu_shares: 4096
+      mem_limit: 5242880000
