@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "app_image" {
   description = "Docker image to run in the ECS cluster"
-  default     = "xxx.dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:scala_2.12"
+  default     = "xxx.dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:scala_2.11"
 }
 
 variable "container_name" {
@@ -53,12 +53,12 @@ variable "health_check_path" {
 
 variable "fargate_cpu" {
   description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = "4096"
+  default     = "1024"
 }
 
 variable "fargate_memory" {
   description = "Fargate instance memory to provision (in MiB)"
-  default     = "20480"
+  default     = "2048"
 }
 
 variable "access_secret_arn" {
@@ -71,3 +71,7 @@ variable "access_key_arn" {
   default     = "blahblah"
 }
 
+variable "arc_job_name" {
+  description = "etl job name"
+  default     = "arc-jupyter"
+}

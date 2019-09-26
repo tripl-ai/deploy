@@ -67,3 +67,5 @@ resource "aws_iam_role_policy_attachment" "ecs_auto_scale_role" {
   role       = aws_iam_role.ecs_auto_scale_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
 }
+
+

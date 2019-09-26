@@ -38,11 +38,11 @@
     ],
     "secrets": [
         {
-            "name": "ETL_CONF_AWS_ACCESS_KEY",
+            "name": "ETL_CONF_S3A_ACCESS_KEY",
             "valueFrom": "${access_key_arn}"          
         },
         {
-            "name": "ETL_CONF_AWS_ACCESS_SECRET",
+            "name": "ETL_CONF_S3A_SECRET_KEY",
             "valueFrom": "${access_secret_arn}"          
         }
     ]
