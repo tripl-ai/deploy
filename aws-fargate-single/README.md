@@ -1,8 +1,8 @@
-##aws-fargate-single
+# aws-fargate-single
 
 This deployment helps you to spin up a long-running single node container via Fargate in AWS ECS. ARC Jupyter Notebook fits in the use case here. 
 
-###The terraform module creates 
+### The terraform module creates 
 
 ```
 - a VPC and networkings in the VPC. NOTE: CIDR is hardcoded. please change it based on your need  (network.tf)
@@ -13,7 +13,7 @@ This deployment helps you to spin up a long-running single node container via Fa
 
 ```
 
-###Steps to run
+### Steps to run
 
 1. Manual change in var.tf
 - update parameters: app_image & az_count 
