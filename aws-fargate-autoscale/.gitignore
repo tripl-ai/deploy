@@ -1,3 +1,0 @@
-*.pem
-*.tfstate*
-.terraform
