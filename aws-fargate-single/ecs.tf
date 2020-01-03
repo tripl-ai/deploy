@@ -1,7 +1,17 @@
 # ecs.tf
 
 resource "aws_ecs_cluster" "main" {
-  name = "arc-cluster"
+  name               = "arc-cluster"
+  capacity_providers = ["FARGATE_SPOT", "FARGATE"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+    base              = 1
+  }
+  tags = {
+    Name = "arcdemo_ecs"
+  }
 }
 
 data "template_file" "arc_app" {
@@ -22,6 +32,7 @@ data "template_file" "arc_app" {
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.container_name}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.s3_ecs_task_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu

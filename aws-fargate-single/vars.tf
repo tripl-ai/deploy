@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "app_image" {
   description = "Docker image to run in the ECS cluster"
-  default     = "xxx.dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:scala_2.11"
+  default     = "[AWS_ACCOUNT_ID].dkr.ecr.[AWS_REGION].amazonaws.com/arc-jupyter:scala_2.11"
 }
 
 variable "container_name" {
@@ -24,23 +24,15 @@ variable "app_count" {
   default     = "1"
 }
 
-
-# The maximum number of containers that should be running.
-# used by both autoscale-perf.tf and autoscale.time.tf
-variable "ecs_autoscale_max_instances" {
-  default = "2"
-}
-
-
 variable "ecs_task_execution_role_name" {
   description = "ECS task execution role name"
   default     = "myEcsTaskExecutionRole"
 }
 
-variable "ecs_auto_scale_role_name" {
-  description = "ECS auto scale role Name"
-  default     = "myEcsAutoScaleRole"
-}
+# variable "ecs_auto_scale_role_name" {
+#   description = "ECS auto scale role Name"
+#   default     = "myEcsAutoScaleRole"
+# }
 
 variable "az_count" {
   description = "Number of AZs to cover in a given region"
@@ -63,13 +55,14 @@ variable "fargate_memory" {
 
 variable "access_secret_arn" {
   description = "secret manager Arn for s3 access secret"
-  default     = "blah"
+  default     = "blahblah"
 }
 
 variable "access_key_arn" {
   description = "secret manager Arn for s3 access key"
   default     = "blahblah"
 }
+
 
 variable "arc_job_name" {
   description = "etl job name"

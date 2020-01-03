@@ -1,9 +1,10 @@
 # alb.tf
 
-resource "aws_alb" "main" {
-  name            = "arcjupyter-demo"
-  subnets         = aws_subnet.public.*.id
-  security_groups = [aws_security_group.lb.id]
+resource "aws_lb" "alb" {
+  name               = "arcjupyter-demo"
+  load_balancer_type = "application"
+  subnets            = aws_subnet.public.*.id
+  security_groups    = [aws_security_group.lb.id]
 }
 
 resource "aws_alb_target_group" "web" {
@@ -46,7 +47,7 @@ resource "aws_alb_target_group" "spark" {
 
 # Redirect all traffic from the ALB to the target group
 resource "aws_alb_listener" "web" {
-  load_balancer_arn = aws_alb.main.id
+  load_balancer_arn = aws_lb.alb.id
   port              = var.app_port
   protocol          = "HTTP"
 
@@ -57,7 +58,7 @@ resource "aws_alb_listener" "web" {
 }
 
 resource "aws_alb_listener" "spark" {
-  load_balancer_arn = aws_alb.main.id
+  load_balancer_arn = aws_lb.alb.id
   port              = 4040
   protocol          = "HTTP"
 
