@@ -1,4 +1,3 @@
 *.pem
 *.tfstate*
 .terraform
-*.DS_Store

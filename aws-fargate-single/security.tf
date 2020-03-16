@@ -60,5 +60,22 @@ resource "aws_security_group" "ecs_tasks" {
   tags = {
     Name = "arc-ecs-tasks-sg"
   }
+}
 
+# Allow ECS connect to ECR via privateLink
+resource "aws_security_group" "endpoint" {
+  name        = "arc-vpc-endpoint-sg"
+  description = "security group used by private links"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    security_groups = [aws_security_group.ecs_tasks.id]
+  }
+
+  tags = {
+    Name = "arc-endpoint-sg"
+  }
 }

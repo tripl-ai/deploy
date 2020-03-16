@@ -5,7 +5,14 @@ variable "aws_region" {
 
 variable "app_image" {
   description = "Docker image to run in the ECS cluster"
-  default     = "xxx.dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:scala_2.11"
+  default     = "triplai/arc-jupyter:arc-jupyter_1.10.0_scala_2.12_hadoop_2.7.7_1.0.0"
+  # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:athena_scala_2.12"
+}
+
+variable "arc_image" {
+  description = "Docker image to run ARC ETL as an ECS task"
+  default     = "triplai/arc:arc_2.7.0_spark_2.4.4_scala_2.12_hadoop_2.7.7_1.0.0"
+  # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc:athena_scala_2.12"
 }
 
 variable "container_name" {
@@ -24,27 +31,19 @@ variable "app_count" {
   default     = "1"
 }
 
-
-# The maximum number of containers that should be running.
-# used by both autoscale-perf.tf and autoscale.time.tf
-variable "ecs_autoscale_max_instances" {
-  default = "2"
-}
-
-
 variable "ecs_task_execution_role_name" {
   description = "ECS task execution role name"
   default     = "myEcsTaskExecutionRole"
 }
 
-variable "ecs_auto_scale_role_name" {
-  description = "ECS auto scale role Name"
-  default     = "myEcsAutoScaleRole"
-}
+# variable "ecs_auto_scale_role_name" {
+#   description = "ECS auto scale role Name"
+#   default     = "myEcsAutoScaleRole"
+# }
 
 variable "az_count" {
   description = "Number of AZs to cover in a given region"
-  default     = "3"
+  default     = "2"
 }
 
 variable "health_check_path" {
@@ -61,17 +60,28 @@ variable "fargate_memory" {
   default     = "2048"
 }
 
-variable "access_secret_arn" {
-  description = "secret manager ARN for the secret named ETL_CONF_S3A_SECRET_KEY"
-  default     = "blah"
+variable "ecs_s3_bucket" {
+  description = "s3 bucket name used by the ecs task"
+  default     = "arcdemo2020"
 }
 
-variable "access_key_arn" {
-  description = "secret manager ARN for the secret named ETL_CONF_S3A_ACCESS_KEY"
-  default     = "blahblah"
+
+variable "arc_container_name" {
+  description = "Docker Container name for ARC ETL"
+  default     = "arc-etl"
 }
 
-variable "arc_job_name" {
-  description = "etl job name"
-  default     = "arc-jupyter"
-}
+# variable "access_secret_arn" {
+#   description = "secret manager Arn for s3 access secret"
+#   default     = "blahblah"
+# }
+
+# variable "access_key_arn" {
+#   description = "secret manager Arn for s3 access key"
+#   default     = "blahblah"
+# }
+
+# variable "kms_arn" {
+#   description = "s3 KMS arn"
+#   default     = ""
+# }

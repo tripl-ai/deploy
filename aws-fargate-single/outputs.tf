@@ -1,5 +1,5 @@
 # outputs.tf
 
-output "alb_hostname" {
-  value = aws_alb.main.dns_name
+output "NOTEBOOK_URL" {
+  value = "${aws_lb.alb.dns_name}:${var.app_port}"
 }
