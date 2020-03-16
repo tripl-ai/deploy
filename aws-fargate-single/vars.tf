@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "app_image" {
   description = "Docker image to run in the ECS cluster"
-  default     = "[AWS_ACCOUNT_ID].dkr.ecr.[AWS_REGION].amazonaws.com/arc-jupyter:scala_2.11"
+  default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:athena_scala_2.12"
 }
 
 variable "container_name" {
@@ -63,8 +63,23 @@ variable "access_key_arn" {
   default     = "blahblah"
 }
 
-
-variable "arc_job_name" {
-  description = "etl job name"
-  default     = "arc-jupyter"
+variable "ecs_s3_bucket" {
+  description = "s3 bucket name used by the ecs task"
+  default     = "testtestmelody"
 }
+
+variable "arc_image" {
+  description = "Docker image to run ARC ETL as an ECS task"
+  default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc:athena_scala_2.12"
+}
+
+variable "arc_container_name" {
+  description = "Docker Container name for ARC ETL"
+  default     = "arc-etl"
+}
+
+
+# variable "kms_arn" {
+#   description = "s3 KMS arn"
+#   default     = ""
+# }

@@ -47,58 +47,65 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# # ECS task role
-# data "aws_iam_policy_document" "s3_ecs_task_role" {
-#   statement {
-#     sid    = ""
-#     effect = "Allow"
-#     actions = [
-#       "s3:ListBucket"
-#     ]
-#     resources = ["arn:aws:s3:::${var.ecs_s3_bucket}"]
-#   }
+# ECS task role
+#need the role for ARC IAM authentication
+data "aws_iam_policy_document" "s3_ecs_task_role" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = ["arn:aws:s3:::${var.ecs_s3_bucket}", "arn:aws:s3:::nyc-tlc"]
+  }
 
-#   statement {
-#     sid    = ""
-#     effect = "Allow"
-#     actions = [
-#       "s3:PutObject",
-#       "s3:GetObject"
-#     ]
-#     resources = ["arn:aws:s3:::${var.ecs_s3_bucket}/*"]
-#   }
-# }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = ["arn:aws:s3:::${var.ecs_s3_bucket}/*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = ["arn:aws:s3:::nyc-tlc/*"]
+  }
+}
 
-# # ECS task role for S3 access
-# resource "aws_iam_role" "s3_ecs_task_role" {
-#   name               = "s3_ecs_task_role"
-#   assume_role_policy = <<EOF
-# {
-# "Version": "2012-10-17",
-# "Statement": [
-# {
-#   "Action": "sts:AssumeRole",
-#   "Principal": {
-#     "Service": "ecs-tasks.amazonaws.com"
-#   },
-#   "Effect": "Allow",
-#   "Sid": ""
-# }
-# ]
-# }
-# EOF
+# ECS task role for S3 access
+resource "aws_iam_role" "s3_ecs_task_role" {
+  name               = "s3_ecs_task_role"
+  assume_role_policy = <<EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+{
+  "Action": "sts:AssumeRole",
+  "Principal": {
+    "Service": "ecs-tasks.amazonaws.com"
+  },
+  "Effect": "Allow",
+  "Sid": ""
+}
+]
+}
+EOF
 
-#   tags = {
-#     Name = "arcdemo-taskrole"
-#   }
-# }
+  tags = {
+    Name = "arcdemo-taskrole"
+  }
+}
 
-# resource "aws_iam_role_policy" "ecs_task_role" {
-#   name   = "s3_ecs_task"
-#   role   = aws_iam_role.s3_ecs_task_role.id
-#   policy = data.aws_iam_policy_document.s3_ecs_task_role.json
-# }
-
+resource "aws_iam_role_policy" "ecs_task_role" {
+  name   = "s3_ecs_task"
+  role   = aws_iam_role.s3_ecs_task_role.id
+  policy = data.aws_iam_policy_document.s3_ecs_task_role.json
+}
+# -------------------------------- END -------------------------------------------
 
 # # ECS auto scale role data
 # data "aws_iam_policy_document" "ecs_auto_scale_role" {

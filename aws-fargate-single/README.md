@@ -1,6 +1,6 @@
 # aws-fargate-single
 
-This deployment helps you to spin up a long-running single node container via Fargate in AWS ECS. ARC Jupyter Notebook fits in the use case here. 
+This deployment helps you to spin up a long-running single node container via AWS Fargate in Amazon ECS. ARC Jupyter Notebook fits in the use case here. 
 
 ### The terraform module creates 
 

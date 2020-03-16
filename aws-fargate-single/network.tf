@@ -52,7 +52,7 @@ resource "aws_subnet" "public" {
 }
 
 # ====================================================================================
-# ============================== Create Route table ==================================
+# ============================== Set Default Route table As Public ===================
 # ====================================================================================
 
 # # Route table: attach Internet Gateway 
@@ -72,7 +72,7 @@ resource "aws_subnet" "public" {
 #   count          = var.az_count
 #   subnet_id      = element(aws_subnet.public.*.id, count.index)
 #   route_table_id = aws_route_table.public.id
-
+# }
 
 # Route the public subnet traffic through the IGW
 resource "aws_route" "internet_access" {
@@ -86,36 +86,44 @@ resource "aws_route" "internet_access" {
 # =========== If ECS task doesn't need internet connection, no need NAT ==============
 # ====================================================================================
 
-# # Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
-# resource "aws_eip" "gw" {
-#   count      = var.az_count
-#   vpc        = true
-#   depends_on = [aws_internet_gateway.igw]
+# Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
+# This block can be grey out if no need internet
+#------------------START---------------------------
+resource "aws_eip" "gw" {
+  count      = var.az_count
+  vpc        = true
+  depends_on = [aws_internet_gateway.igw]
 
-#   tags = {
-#     Name = "arcdemo_eip"
-#   }
-# }
-# resource "aws_nat_gateway" "gw" {
-#   count         = var.az_count
-#   subnet_id     = element(aws_subnet.public.*.id, count.index)
-#   allocation_id = element(aws_eip.gw.*.id, count.index)
+  tags = {
+    Name = "arcdemo_eip"
+  }
+}
 
-#   tags = {
-#     Name = "arcdemo_nat"
-#   }
-# }
+# This block can be grey out if no need internet
+resource "aws_nat_gateway" "gw" {
+  count         = var.az_count
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = element(aws_eip.gw.*.id, count.index)
+
+  tags = {
+    Name = "arcdemo_nat"
+  }
+  depends_on = [aws_subnet.public]
+}
+#--------------------END-------------------------
 
 # Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
 resource "aws_route_table" "private" {
-  # count  = var.az_count
   vpc_id = aws_vpc.main.id
 
-  # route {
-  #   cidr_block     = "0.0.0.0/0"
-  #   nat_gateway_id = element(aws_nat_gateway.gw.*.id, count.index)
-  # }
-
+  # This block can be grey out if private network doesn't need internet
+  #-------------------START--------------------------
+  count = var.az_count
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.gw.*.id, count.index)
+  }
+  #-------------------END--------------------------
   tags = {
     Name = "arcdemo_private_rtbl"
   }
@@ -144,6 +152,7 @@ resource "aws_vpc_endpoint" "s3" {
   tags = {
     Name = "arcdemo_s3_endpoint"
   }
+  depends_on = [aws_route_table.private]
 }
 
 

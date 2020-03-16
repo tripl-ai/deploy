@@ -14,7 +14,10 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
-data "template_file" "arc_app" {
+# -----------------------------------------------------
+# Create ARC Jupyter task definition
+# -----------------------------------------------------
+data "template_file" "arc_jupyter" {
   template = file("./templates/ecs/arc_app.json.tpl")
 
   vars = {
@@ -26,10 +29,11 @@ data "template_file" "arc_app" {
     aws_region        = var.aws_region
     access_key_arn    = var.access_key_arn
     access_secret_arn = var.access_secret_arn
+    # kms_arn           = var.kms_arn
   }
 }
 
-resource "aws_ecs_task_definition" "app" {
+resource "aws_ecs_task_definition" "jupyter" {
   family                   = "${var.container_name}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.s3_ecs_task_role.arn
@@ -37,13 +41,46 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu
   memory                   = var.fargate_memory
-  container_definitions    = data.template_file.arc_app.rendered
+  container_definitions    = data.template_file.arc_jupyter.rendered
 }
 
+
+# -----------------------------------------------------
+# Create ARC task definition
+# -----------------------------------------------------
+data "template_file" "arc_etl" {
+  template = file("./templates/ecs/arc_etl.json.tpl")
+
+  vars = {
+    arc_container_name = var.arc_container_name
+    arc_image          = var.arc_image
+    fargate_cpu        = var.fargate_cpu
+    fargate_memory     = var.fargate_memory
+    aws_region         = var.aws_region
+    access_key_arn     = var.access_key_arn
+    access_secret_arn  = var.access_secret_arn
+    ecs_s3_bucket      = var.ecs_s3_bucket
+    # kms_arn           = var.kms_arn
+  }
+}
+
+resource "aws_ecs_task_definition" "arc" {
+  family                   = "${var.arc_container_name}-task"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.s3_ecs_task_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.fargate_cpu
+  memory                   = var.fargate_memory
+  container_definitions    = data.template_file.arc_etl.rendered
+}
+
+
+
 resource "aws_ecs_service" "main" {
-  name            = var.arc_job_name
+  name            = var.container_name
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
+  task_definition = aws_ecs_task_definition.jupyter.arn
   desired_count   = var.app_count
   launch_type     = "FARGATE"
 
