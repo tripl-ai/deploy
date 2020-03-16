@@ -24,21 +24,25 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   }
 }
 
-# Allow to retrive AWS access key from secret manager
-data "aws_iam_policy_document" "ecs_secret" {
-  statement {
-    sid       = ""
-    effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["${var.access_key_arn}", "${var.access_secret_arn}"]
-  }
-}
 
-resource "aws_iam_role_policy" "ecs_secret" {
-  name   = "ecs_secret_policy"
-  role   = aws_iam_role.ecs_task_execution_role.id
-  policy = data.aws_iam_policy_document.ecs_secret.json
-}
+
+## Allow to retrive AWS access key, grey out this block if no need secret manager
+# -------------------------------- BEGIN -------------------------------------------
+# data "aws_iam_policy_document" "ecs_secret" {
+#   statement {
+#     sid       = ""
+#     effect    = "Allow"
+#     actions   = ["secretsmanager:GetSecretValue"]
+#     resources = ["${var.access_key_arn}", "${var.access_secret_arn}"]
+#   }
+# }
+
+# resource "aws_iam_role_policy" "ecs_secret" {
+#   name   = "ecs_secret_policy"
+#   role   = aws_iam_role.ecs_task_execution_role.id
+#   policy = data.aws_iam_policy_document.ecs_secret.json
+# }
+# -------------------------------- END -------------------------------------------
 
 
 # ECS task execution role policy attachment

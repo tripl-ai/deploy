@@ -18,17 +18,18 @@ resource "aws_ecs_cluster" "main" {
 # Create ARC Jupyter task definition
 # -----------------------------------------------------
 data "template_file" "arc_jupyter" {
-  template = file("./templates/ecs/arc_app.json.tpl")
+  # template = file("./templates/ecs/arc_app.json.tpl")
+  template = file("./templates/ecs/arc_app_iam.json.tpl")
 
   vars = {
-    container_name    = var.container_name
-    app_image         = var.app_image
-    app_port          = var.app_port
-    fargate_cpu       = var.fargate_cpu
-    fargate_memory    = var.fargate_memory
-    aws_region        = var.aws_region
-    access_key_arn    = var.access_key_arn
-    access_secret_arn = var.access_secret_arn
+    container_name = var.container_name
+    app_image      = var.app_image
+    app_port       = var.app_port
+    fargate_cpu    = var.fargate_cpu
+    fargate_memory = var.fargate_memory
+    aws_region     = var.aws_region
+    # access_key_arn    = var.access_key_arn
+    # access_secret_arn = var.access_secret_arn
     # kms_arn           = var.kms_arn
   }
 }
@@ -49,7 +50,8 @@ resource "aws_ecs_task_definition" "jupyter" {
 # Create ARC task definition
 # -----------------------------------------------------
 data "template_file" "arc_etl" {
-  template = file("./templates/ecs/arc_etl.json.tpl")
+  # template = file("./templates/ecs/arc_etl.json.tpl")
+  template = file("./templates/ecs/arc_etl_iam.json.tpl")
 
   vars = {
     arc_container_name = var.arc_container_name
@@ -57,9 +59,9 @@ data "template_file" "arc_etl" {
     fargate_cpu        = var.fargate_cpu
     fargate_memory     = var.fargate_memory
     aws_region         = var.aws_region
-    access_key_arn     = var.access_key_arn
-    access_secret_arn  = var.access_secret_arn
     ecs_s3_bucket      = var.ecs_s3_bucket
+    # access_key_arn     = var.access_key_arn
+    # access_secret_arn  = var.access_secret_arn
     # kms_arn           = var.kms_arn
   }
 }
