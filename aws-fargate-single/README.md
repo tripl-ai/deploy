@@ -14,9 +14,16 @@ This deployment helps you to spin up a long-running single node container via AW
 
 ### Steps to run
 
-0. Manual change  ( skip the step if pulling docker images from a public docker hub )
+0. Manual change
+- update ecs_s3_bucket name to your own in vars.tf 
+
+```
+skip the following steps if pulling docker images from a public docker hub 
+
 - update ECR docker image : app_image & arc_image (vars.tf)
 - Have to leverage AWS Secret Manager? checkout the example in templates/ecs/arc_app.json.tpl
+
+```
 
 1. `cd aws-fargate-single`
 2. `terraform init`
