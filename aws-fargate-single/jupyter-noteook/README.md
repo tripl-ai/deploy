@@ -19,6 +19,7 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 ### 1.Update backend s3 bucket name [Optional]
 
 Ignore this step if you skip the [base infrustructure setup](../base/README.md). Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
+
 <img src="../image/s3_backend.png" alt="drawing" width="330" height="130"/>
 
 ### 2. Update ecs\_s3\_bucket parameter 
