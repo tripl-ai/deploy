@@ -20,13 +20,13 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 
 Ignore this step if you skip the [base infrustructure setup](../base/README.md). Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
 
-<img src="../image/s3_backend.png" alt="drawing" width="330" height="130"/>
+<img src="../image/s3_backend.png" alt="drawing" width="440" height="170"/>
 
 ### 2. Update ecs\_s3\_bucket parameter 
 
 Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket to store ARC configuration files
 
-<img src="../image/param.png" alt="drawing" width="440" height="80"/>
+<img src="../image/param.png" alt="drawing" width="440" height="100"/>
 
 ### 3. Deploy
 ```
@@ -38,7 +38,9 @@ $ ./run.sh
 ```
 
 ## Outputs
-![output](../image/jupyter_output.png)
+
+<img src="../image/jupyter_output.png" alt="drawing" width="440" height="100"/>
+
 
 | Name | Description |
 |------|-------------|
