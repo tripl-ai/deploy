@@ -12,19 +12,18 @@ variable "region" {
 
 # The AWS profile to use, this would be the same value used in AWS_PROFILE.
 variable "aws_profile" {
-  default = "default"
+  default = "labtest"
 }
 
 
 # The role that will have access to the S3 bucket, this should be a role that all
 # members of the team have access to.
-variable "saml_role" {
-  default= "s3-tf-remote-state"
+variable "s3_read_access_role" {
 }
 
 # Name of the application. This value should usually match the application tag below.
 variable "app" {
-  default = "arcdemo"
+  default = "arcdemo2020"
 }
 
 # A map of the tags to apply to various resources. The required tags are:
@@ -34,11 +33,13 @@ variable "app" {
 # `contact-email`, contact email for the _team_;
 # and `customer`, who the application was create for.
 variable "tags" {
-  type = map(string)
-   default = {
-    "team" = "my-team"
-    "application" = "arcdemo"
-    "environment" ="dev"
-    "customer"="my-cust"
+  type = map
+
+  default = {
+    "application"   = "atcdemo2020"
+    "environment"   = "dev"
+    "team"          = "integration"
+    "contact-email" = "dummy@abc.com"
+    "customer"      = "hospital"
   }
 }

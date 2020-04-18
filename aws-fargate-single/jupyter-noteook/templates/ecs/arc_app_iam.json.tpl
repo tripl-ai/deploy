@@ -34,6 +34,10 @@
         {
           "name": "JAVA_OPTS",
           "value": "-Xmx10g"
+        },
+        {
+          "name": "conf_fs_s3a_bucket_testtestmelody_aws_credentials_provider",
+          "value": "com.amazonaws.auth.ContainerCredentialsProvider"
         }
     ]
   }
