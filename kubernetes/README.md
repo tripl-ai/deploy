@@ -1,5 +1,7 @@
 # Kubernetes
 
+Note: This guide assumes a `macOS` environment.
+
 ## Tools needed
 
 You need a way of interacting with the Kubernetes cluster so install the `kubectl` cli:
@@ -51,7 +53,7 @@ kubectl create namespace argo
 kubectl apply -n argo -f argo/install.yaml
 ```
 
-Additionally create service account permissions so the containers can interact with the Kubernetes API. These permissions give *administrator* rights so do not use in production.
+Additionally create service account permissions so the containers can interact with the Kubernetes API. These permissions give **administrator** rights so do not use in production.
 
 ```bash
 kubectl create rolebinding default-admin --clusterrole=admin --serviceaccount=default:default
