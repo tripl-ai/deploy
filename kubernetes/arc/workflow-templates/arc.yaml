@@ -51,7 +51,7 @@ spec:
         arguments:
           parameters:
           - name: image
-            value: "{{inputs.parameters.image}}"              
+            value: "{{inputs.parameters.image}}"
           - name: executionId
             value: "{{tasks.executionId.outputs.result}}"
         continueOn:
@@ -62,7 +62,7 @@ spec:
         arguments:
           parameters:
           - name: image
-            value: "{{inputs.parameters.image}}"            
+            value: "{{inputs.parameters.image}}"
           - name: executionId
             value: "{{tasks.executionId.outputs.result}}"
           - name: driverCores
@@ -93,7 +93,7 @@ spec:
         arguments:
           parameters:
           - name: image
-            value: "{{inputs.parameters.image}}"              
+            value: "{{inputs.parameters.image}}"
           - name: executionId
             value: "{{tasks.executionId.outputs.result}}"
           - name: status
