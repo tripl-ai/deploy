@@ -16,8 +16,8 @@ Common variables to use in various Terraform files.
 + `state.tf`  
 Generate a [remote state][state] bucket in S3 for use with later Terraform runs.
 
-+ `ecr.tf`  
-Creates an AWS [Elastic Container Registry (ECR)][ecr] for the application.
++ `ecr.tf` [OPTIONAL]
+Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images.
 
 
 ## Usage
@@ -55,7 +55,7 @@ $ terraform apply
 | Name | Description |
 |------|-------------|
 | bucket | Returns the name of the S3 bucket that will be used in later Terraform files |
-| docker_registry | Returns the name of the ECR registry, this will be used later in various scripts |
+| docker_registry | Returns the name of the ECR registry, this will be used when push a public docker image to the ECR |
 
 
 ## Additional Information

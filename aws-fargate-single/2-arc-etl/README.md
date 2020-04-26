@@ -20,7 +20,9 @@ A terraform lambda module to fire up an ECS Task, triggered by a file arrival ev
 ## Steps to deploy
 ### 1.Update backend s3 bucket name [Optional]
 
-Ignore this step if you skip the [base infrustructure setup](./base/README.md). Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
+Ignore this step if you have skipped the [base infrustructure setup](../base/README.md) previously. 
+
+Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
 
 <img src="../image/s3_backend2.png" alt="drawing" width="370" height="200"/>
 
@@ -49,6 +51,8 @@ $ terraform apply
 | is_stream | indicator of streaming or batch data process | string | `false` | yes |
 
 ## Outputs
+
+<img src="../image/job_trigger_output.png" alt="drawing" width="450" height="80"/>
 
 | Name | Description |
 |------|-------------|

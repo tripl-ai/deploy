@@ -18,13 +18,15 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 
 ### 1.Update backend s3 bucket name [Optional]
 
-Ignore this step if you skip the [base infrustructure setup](./base/README.md). Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
+Ignore this step if you have skipped the [base infrustructure setup](../base/README.md) previously. 
+
+Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
 
 <img src="../image/s3_backend.png" alt="drawing" width="440" height="170"/>
 
 ### 2. Update ecs\_s3\_bucket parameter 
 
-Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket to store ARC configuration files
+Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket in your AWS account, to store ARC configuration files
 
 <img src="../image/param.png" alt="drawing" width="440" height="100"/>
 
