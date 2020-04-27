@@ -2,7 +2,6 @@
 
 Creates the foundational infrastructure for the application's infrastructure.
 These Terraform files will create a [remote state][state] and a [registry][ecr].
-Most other infrastructure pieces will be created within the `environments` directory.
 
 
 ## Included Files

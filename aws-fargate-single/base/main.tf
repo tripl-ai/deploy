@@ -20,9 +20,9 @@ provider "aws" {
  */
 
 # Returns the name of the ECR registry, this will be used later in various scripts
-output "docker_registry" {
-  value = aws_ecr_repository.app.repository_url
-}
+# output "docker_registry" {
+#   value = aws_ecr_repository.app.repository_url
+# }
 
 # Returns the name of the S3 bucket that will be used in later Terraform files
 output "bucket" {

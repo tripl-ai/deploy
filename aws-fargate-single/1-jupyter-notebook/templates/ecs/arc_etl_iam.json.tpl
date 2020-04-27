@@ -26,6 +26,14 @@
         "local[*]",
         "--conf",
         "spark.sql.streaming.checkpointLocation=demo",
+        "--conf",
+        "spark.authenticate=true",
+        "--conf",
+        "spark.authenticate.secret=$(openssl rand -hex 64)",
+        "--conf",
+        "spark.io.encryption.enabled=true",
+        "--conf",
+        "spark.network.crypto.enabled=true",
         "--class",
         "ai.tripl.arc.ARC",
         "/opt/spark/jars/arc.jar"
@@ -42,6 +50,10 @@
         {
           "name": "ETL_CONF_STREAMING",
           "value": "false"
+        },
+        {
+          "name": "ETL_CONF_INPUT_LOC",
+          "value": "s3a://${ecs_s3_bucket}"
         },
         {
           "name": "ETL_CONF_TAGS",

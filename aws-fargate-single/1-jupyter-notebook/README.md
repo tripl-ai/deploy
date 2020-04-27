@@ -10,7 +10,7 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 | VPC Endpoint| private connectivity between AWS services, such as `ECS to s3` or `ECR to ECS` | an extra data security over internet| network.tf|
 | Application Load Balancer| using ALB to forward traffic to ARC jupyter container |provides an extra data security over network|alb.tf|
 | ECS service | host one or multiple ARC jupyter containers with isolated compute, data access control. |ECS service is a logic group of long running tasks of the same Jupyter Notebook Task Definition.| ecs.tf|
-| ECS task definition |Two task definitions are created: `arc-jupyter and arc-etl`| contains docker related information,such as network, compute,security and docker imanges etc.| templates/ecs/arc_app_iam.json.tpl templates/ecs/arc_etl_iam.json.tpl |
+| ECS task definition |Two task definitions are created: `arc-jupyter and arc-etl`| contains docker related information,such as network, compute,security and docker imanges etc.| templates/ecs/arc\_app\_iam.json.tpl templates/ecs/arc\_etl\_iam.json.tpl |
 
 
 
