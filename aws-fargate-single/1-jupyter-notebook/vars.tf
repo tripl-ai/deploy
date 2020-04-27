@@ -4,16 +4,17 @@ variable "aws_region" {
 }
 
 variable "app_image" {
-  description = "Docker image to run in the ECS cluster"
-  default     = "triplai/arc-jupyter:arc-jupyter_1.10.0_scala_2.12_hadoop_2.7.7_1.0.0"
+  description = "Docker image to run arc jupyter notebook as an ECS service"
+  default     = "triplai/arc-jupyter:arc-jupyter_2.2.0_scala_2.12_hadoop_2.9.2_1.0.0"
   # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:athena_scala_2.12"
 }
 
 variable "arc_image" {
   description = "Docker image to run ARC ETL as an ECS task"
-  default     = "triplai/arc:arc_2.7.0_spark_2.4.4_scala_2.12_hadoop_2.7.7_1.0.0"
+  default     = "triplai/arc:arc_2.10.0_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0"
   # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc:athena_scala_2.12"
 }
+
 
 variable "container_name" {
   description = "Docker Container name in ECS cluster"
@@ -61,7 +62,7 @@ variable "fargate_memory" {
 }
 
 variable "ecs_s3_bucket" {
-  description = "s3 bucket name used by the ecs task"
+  description = "s3 bucket name used to store ARC configuration files"
   default     = "arcdemo2020"
 }
 

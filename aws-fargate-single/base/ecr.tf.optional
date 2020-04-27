@@ -7,10 +7,10 @@
 # create an ECR repo at the app/image level
 resource "aws_ecr_repository" "app" {
   name = var.app
-  
+
   image_scanning_configuration {
     scan_on_push = true
-  } 
+  }
 }
 
 # data "aws_caller_identity" "current" {}

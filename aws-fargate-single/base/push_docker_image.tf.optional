@@ -1,0 +1,14 @@
+resource "null_resource" "pull_push_image" {
+
+  provisioner "local-exec" {
+    command = "bash ./build_docker.sh"
+
+    environment = {
+      REGION        = var.region
+      JUPYTER_IMAGE = var.app_image
+      ARC_IMAGE     = var.arc_image
+      ECR_REPO      = aws_ecr_repository.app.repository_url
+    }
+
+  }
+}

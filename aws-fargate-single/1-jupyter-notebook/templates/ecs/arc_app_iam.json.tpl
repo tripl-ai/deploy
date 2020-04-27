@@ -25,8 +25,11 @@
         "hostPort":4040
       }
     ],
-     "command": [
-          "start-notebook.sh",
+    "command": [
+          "jupyter",
+          "notebook",
+          "--ip=0.0.0.0",
+          "--no-browser",
           "--NotebookApp.password=''",
           "--NotebookApp.token=''"
      ],
@@ -34,6 +37,10 @@
         {
           "name": "JAVA_OPTS",
           "value": "-Xmx10g"
+        },
+        {
+          "name": "conf_fs_s3a_bucket_testtestmelody_aws_credentials_provider",
+          "value": "com.amazonaws.auth.ContainerCredentialsProvider"
         }
     ]
   }

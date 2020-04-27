@@ -25,8 +25,11 @@
         "hostPort":4040
       }
     ],
-     "command": [
-          "start-notebook.sh",
+    "command": [
+          "jupyter",
+          "notebook",
+          "--ip=0.0.0.0",
+          "--no-browser",
           "--NotebookApp.password=''",
           "--NotebookApp.token=''"
      ],

@@ -1,34 +1,52 @@
 # aws-fargate-single
 
-This deployment helps you to spin up a long-running single node container via AWS Fargate in Amazon ECS. ARC Jupyter Notebook fits in the use case here. 
+The Terraform deployment helps you to spin up a single node compute resource via AWS Fargate in Amazon ECS, which will create a long running ECS service for [ARC Jupyter Notebook](./1-jupyter-notebook/README.md) and a transient ECS task for [ARC job](./2-arc-etl/README.md).
 
-### The terraform module creates 
 
+## Usage
+
+### 1. Download the project
 ```
-- VPC and networkings in the VPC. NOTE: CIDR is hardcoded. please change it based on your need  (network.tf)
-- Application Load Balancer (alb.tf)
-- ECS service  (ecs.tf)
-- Two ECS task definitions containing docker run commands (** templates/ecs/arc_app_iam.json.tpl & arc_etl_iam.json.tpl ** )
-
-```
-
-### Steps to run
-
-1. `cd aws-fargate-single`
-
-2. Manual change
-- update ecs_s3_bucket name to your own in vars.tf 
-
-```
-skip the following steps if pulling docker images from a public docker hub 
-
-- update ECR docker image: app_image & arc_image (vars.tf)
-- Have to leverage AWS Secret Manager? checkout the example in templates/ecs/arc_app.json.tpl
-
+$ git clone git@github.com:tripl-ai/deploy.git
+$ cd deploy/aws-fargate-single
 ```
 
-3. `terraform init`
+### 2. Setup base infrastructure [Optional]
 
-4. `./run.sh` 
+To store your deployment [state remotely](https://www.terraform.io/docs/state/remote.html), create an s3 bucket by following the instruction in the [base module](./base/README.md), then note down your new s3 bucket name. 
 
+If you prefer to store the state on your local computer, please skip this step.
+
+
+### 3. Deploy Jupyter Notebook
+```
+$ cd 1-jupyter-notebook
+```
+Follow the [instruction](./1-jupyter-notebook/README.md) to spin up an ARC jupyter-notebook instance in AWS Fargate
+### 4. Setup Job Trigger
+```
+$ cd 2-arc-etl
+```
+Make sure you have deployed jupyter-notebook first, then follow the [instruction](./2-arc-etl/README.md) to setup an automated trigger to execute ARC job in AWS Fargate. It means the job will be fired up once you drop off an jupyter notebook file to the location.
+
+
+
+### 5. Clean Up
+
+This is really important because if you leave stuff running in your account, it will continue to generate charges. Make sure you clean them up by the following command in order:
+
+```
+# clean up job trigger first
+$ cd 2-arc-etl
+$ terraform destroy
+
+# clean up essential infrastructure
+cd ../1-jupyter-noetbook
+terraform destroy
+
+# clean up base infrastructure [OPTIONAL]
+cd ../base
+terraform destroy
+
+```
 

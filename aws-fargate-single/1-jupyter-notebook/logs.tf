@@ -10,3 +10,11 @@ resource "aws_cloudwatch_log_group" "arcdemo_log_group" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "arc_etl_log_group" {
+  name              = "/ecs/${var.arc_container_name}"
+  retention_in_days = 30
+
+  tags = {
+    Name = "arcdemo-log-group"
+  }
+}

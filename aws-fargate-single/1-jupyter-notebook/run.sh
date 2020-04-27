@@ -6,8 +6,8 @@
 
 # start remote machines and job
 terraform apply -auto-approve \
--var="fargate_memory=20480" \
--var="fargate_cpu=4096" 
+-var="fargate_memory=8192" \
+-var="fargate_cpu=1024" 
 # -var="access_secret_arn=${S3_SECRET_ARN}" \
 # -var="access_key_arn=${S3_KEY_ARN}"
 # -var="kms_arn=${KMS_ARN}"
