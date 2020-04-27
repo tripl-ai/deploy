@@ -1,6 +1,15 @@
+# Deploy
+
+## Kubernetes
+
+This example shows how to set up a local Kuberetes cluster and deploy jobs using Argo:
+
+- [kubernetes](https://github.com/tripl-ai/deploy/tree/master/kubernetes) for running on Kubernetes.
+
+## AWS
+
 These are example [Terraform](https://www.terraform.io/) scripts to demonstrate how to execute Arc against a remote cluster.
 
-For AWS:
 - [aws-single-master](https://github.com/tripl-ai/deploy/tree/master/aws-single-master) for a single instance. 
 - [aws-cluster](https://github.com/tripl-ai/deploy/tree/master/aws-cluster) for a multi-instance cluster.
 - [aws-fargate-single](https://github.com/tripl-ai/deploy/tree/master/aws-fargate-single) for a serverless option.
