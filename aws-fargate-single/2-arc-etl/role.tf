@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ecs" {
       "ecs:RunTask"
     ]
     resources = [
-      "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:task-definition/${var.ecs_task_name}:*"
+      "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:task-definition/${var.ecs_container_name}-task:*"
     ]
     condition {
       test     = "ArnLike"

@@ -3,7 +3,7 @@ data "aws_s3_bucket" "selected" {
 }
 
 data "aws_ecs_task_definition" "etl" {
-  task_definition = "${var.ecs_container_name-task}"
+  task_definition = "${var.ecs_container_name}-task"
 }
 
 data "aws_security_group" "selected" {
