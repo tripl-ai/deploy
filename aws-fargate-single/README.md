@@ -13,7 +13,7 @@ $ cd deploy/aws-fargate-single
 
 ### 2. Setup base infrastructure [Optional]
 
-To store your deployment [state remotely](https://www.terraform.io/docs/state/remote.html), create an s3 bucket by following the instruction in the [base module](./base/README.md), then note down your new s3 bucket name. 
+To store your deployment [state remotely](https://www.terraform.io/docs/state/remote.html), create an s3 bucket by following the instruction in the [base module](./0-base/README.md), then note down the new s3 bucket name. 
 
 If you prefer to store the state on your local computer, please skip this step.
 

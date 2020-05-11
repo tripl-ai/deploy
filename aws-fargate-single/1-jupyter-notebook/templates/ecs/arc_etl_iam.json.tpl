@@ -61,7 +61,11 @@
         },
         {
           "name": "ETL_CONF_URI",
-          "value": "s3a://${ecs_s3_bucket}/arcjupyter/job/IMDB_batch_demo_final.json"
+          "value": "s3a://blahblah.json"
+        },
+        {
+          "name": "ETL_CONF_INPUT_LOC",
+          "value": "${ecs_s3_bucket}"
         }
     ]
   }

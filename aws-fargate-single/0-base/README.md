@@ -1,4 +1,4 @@
-# Base Terraform
+s# Base Terraform
 
 Creates the foundational infrastructure for the application's infrastructure.
 These Terraform files will create a [remote state][state] and a [registry][ecr].
@@ -16,7 +16,10 @@ Common variables to use in various Terraform files.
 Generate a [remote state][state] bucket in S3 for use with later Terraform runs.
 
 + `ecr.tf` [OPTIONAL]
-Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images.
+Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images. If you would like to create an ECR and push ARC images to it, rename all files with extension of tf.optional to tf, then run the `terraform init`.
+
++`push_docker_image.tf` [OPTIONAL]
+Pull ARC docker images from docker hub and push to [ECR][ecr]. If you would like to deploy this module, rename the file from tf.optional to tf, then run the `terraform init`.
 
 
 ## Usage
@@ -28,7 +31,7 @@ Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images.
 ### 2. Run the command
 ```
 # Get into base folder
-$ cd base
+$ cd 0-base
 
 # Sets up Terraform to run
 $ terraform init
@@ -54,7 +57,7 @@ $ terraform apply
 | Name | Description |
 |------|-------------|
 | bucket | Returns the name of the S3 bucket that will be used in later Terraform files |
-| docker_registry | Returns the name of the ECR registry, this will be used when push a public docker image to the ECR |
+
 
 
 ## Additional Information

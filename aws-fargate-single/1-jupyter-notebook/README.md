@@ -18,15 +18,15 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 
 ### 1.Update backend s3 bucket name [Optional]
 
-Ignore this step if you have skipped the [base infrustructure setup](../base/README.md) previously. 
+Ignore this step if you have skipped the [base infrustructure setup](../0-base/README.md) previously. 
 
-Open the file `provider.tf`, uncomment the following block and update the `bucket` to the one created by your base infrastructure deployment.
+Otherwise, open the file `provider.tf`, uncomment the following block and update the `bucket` to the new one created by your base infrastructure deployment.
 
 <img src="../image/s3_backend.png" alt="drawing" width="440" height="170"/>
 
 ### 2. Update ecs\_s3\_bucket parameter 
 
-Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket in your AWS account, to store ARC configuration files
+Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket in your AWS account, to store ARC  configure files and notebooks.
 
 <img src="../image/param.png" alt="drawing" width="440" height="100"/>
 
@@ -35,9 +35,28 @@ Go to the `vars.tf` file, change `ecs_s3_bucket` to an existing bucket in your A
 # Sets up Terraform to run
 $ terraform init
 
-# Executes the Terraform run
-$ ./run.sh
+# Spin up a Fargate instance with 8GB memory and 1vCPU.
+# Jupyter need 4GB at least, update the config and task definition template if needed. 
+$ terraform apply -auto-approve -var="fargate_memory=8192" -var="fargate_cpu=1024" 
+
 ```
+
+### 4. Upload an example notebook
+
+Copy and paste the NOTEBOOK_URL into your web browser, then click `Upload` button. Locate the repository folder on your computer, the sample notebook is stored in 
+```
+deploy/aws-fargate-single/appcode/job/nyctaxi_inlineSQL_demo.ipynb
+```
+
+
+### 5. OPTIONAL
+
+If you'd like to try out the Athena `JDBCExecute` block as the last step, go to Secrets Manager on AWS console and correct Athena credential with your own AWS access key associated to an IAM user.
+<img src="../image/update_secret.png" alt="drawing" width="440" height="100"/>
+
+Finally, stop the running Jupyter task in ECS to refresh the access key pair. You should be able to connect to your Athena via JDBC, once the new jupyter notebook is back online.
+<img src="../image/stop_task.png" alt="drawing" width="440" height="100"/>
+
 
 ## Outputs
 
@@ -47,4 +66,8 @@ $ ./run.sh
 | Name | Description |
 |------|-------------|
 | NOTEBOOK_URL | A web link to a jupyter notebook instance. Copy and paste to your web browser. If you have 503 error, it means it is still deploying. Just wait for few more minutes. |
+
+
+
+
 

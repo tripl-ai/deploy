@@ -36,11 +36,11 @@
      "environment": [
         {
           "name": "JAVA_OPTS",
-          "value": "-Xmx10g"
+          "value": "-Xmx6g"
         },
         {
-          "name": "conf_fs_s3a_bucket_testtestmelody_aws_credentials_provider",
-          "value": "com.amazonaws.auth.ContainerCredentialsProvider"
+          "name": "ETL_CONF_INPUT_LOC",
+          "value": "${ecs_s3_bucket}"
         }
     ]
   }
