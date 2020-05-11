@@ -4,7 +4,7 @@ variable "region" {
 }
 
 variable "filterprefix" {
-  default = "job"
+  default = "appcode/job"
 }
 
 variable "filtersuffix" {
