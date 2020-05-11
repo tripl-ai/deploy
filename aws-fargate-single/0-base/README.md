@@ -1,7 +1,7 @@
 # Base Terraform
 
 Creates the foundational infrastructure for the application's infrastructure.
-These Terraform files will create a [remote state][state] and a [registry][ecr].
+These Terraform files will create a [remote state][state] S3 bucket and a [container registry][ecr].
 
 
 ## Included Files
@@ -15,13 +15,9 @@ Common variables to use in various Terraform files.
 + `state.tf`  
 Generate a [remote state][state] bucket in S3 for use with later Terraform runs.
 
-+ `ecr.tf` [OPTIONAL] 
-</br>
-Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images.
++ `ecr.tf` [OPTIONAL]</br>Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images.
 
-+ `push_docker_image.tf` [OPTIONAL] 
-</br>
-Pull ARC docker images from docker hub and push to [ECR][ecr]. </br> If you want to create an ECR and push ARC images to it, rename all files with extension of `tf.optional` to `tf`, then run `terraform init` & `terraform apply`
++ `push_docker_image.tf` [OPTIONAL]</br>Pull ARC docker images from docker hub and push to [ECR][ecr]. </br> If you want to create an ECR and push ARC images to it, rename all files with extension of `tf.optional` to `tf`, then run `terraform init` & `terraform apply`
 
 
 ## Usage
