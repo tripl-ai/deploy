@@ -5,7 +5,7 @@ This deployment helps you to spin up a long-running container via AWS Fargate in
 ## The Terraform module creates 
 
 | Resource | Description | Comment | Ref_file|
-|----------|-------------|:---------:|:-----:|
+|----------|---------|---------|:-----:|
 | VPC & networking |network resources that will be used by ARC|CIDR is hardcoded. please change it based on your use case| network.tf|
 | VPC Endpoint| private connectivity between AWS services, such as `ECS to s3` or `ECR to ECS` | an extra data security over internet| network.tf|
 | Application Load Balancer| using ALB to forward traffic to ARC jupyter container |provides an extra data security over network|alb.tf|
