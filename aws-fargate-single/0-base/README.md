@@ -16,10 +16,11 @@ Common variables to use in various Terraform files.
 Generate a [remote state][state] bucket in S3 for use with later Terraform runs.
 
 + `ecr.tf` [OPTIONAL]
-Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images. If you would like to create an ECR and push ARC images to it, rename all files with extension of tf.optional to tf, then run the `terraform init`.
+Create an AWS [Elastic Container Registry (ECR)][ecr] to store docker images. 
 
-+`push_docker_image.tf` [OPTIONAL]
-Pull ARC docker images from docker hub and push to [ECR][ecr]. If you would like to deploy this module, rename the file from tf.optional to tf, then run the `terraform init`.
++ `push_docker_image.tf` [OPTIONAL]
+Pull ARC docker images from docker hub and push to [ECR][ecr]. If you would like to create an ECR and push ARC images to it, rename all files with extension of `tf.optional` to `tf`, then run the `terraform init`.
+
 
 
 ## Usage
