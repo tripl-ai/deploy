@@ -20,7 +20,7 @@ resource "aws_alb_target_group" "web" {
     protocol            = "HTTP"
     matcher             = "302"
     timeout             = "5"
-    path                = var.health_check_path
+    path                = "/"
     unhealthy_threshold = "2"
   }
 }
@@ -37,7 +37,7 @@ resource "aws_alb_target_group" "spark" {
     protocol            = "HTTP"
     matcher             = "302"
     timeout             = "5"
-    path                = var.health_check_path
+    path                = "/"
     unhealthy_threshold = "2"
     port                = var.app_port
   }

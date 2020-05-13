@@ -23,7 +23,7 @@ variable "s3_read_access_role" {
 
 # Name of the application. This value should usually match the application tag below.
 variable "app" {
-  default = "arcdemo2020"
+  default = "arcdemo"
 }
 
 # A map of the tags to apply to various resources. The required tags are:
@@ -36,7 +36,7 @@ variable "tags" {
   type = map
 
   default = {
-    "application"   = "arcdemo2020"
+    "application"   = "arcdemo"
     "environment"   = "dev"
     "team"          = "integration"
     "contact-email" = "dummy@abc.com"
@@ -45,11 +45,11 @@ variable "tags" {
 }
 
 variable "app_image" {
-  description = "Docker image to run in the ECS cluster"
-  default     = "triplai/arc-jupyter:arc-jupyter_2.2.0_scala_2.12_hadoop_2.9.2_1.0.0"
+  description = "Docker image to run jupyter notebook in the ECS cluster"
+  default     = "triplai/arc-jupyter"
 }
 
 variable "arc_image" {
   description = "Docker image to run ARC ETL as an ECS task"
-  default     = "triplai/arc:arc_2.10.0_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0"
+  default     = "triplai/arc"
 }

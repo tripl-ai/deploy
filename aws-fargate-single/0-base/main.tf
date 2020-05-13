@@ -18,12 +18,6 @@ provider "aws" {
  * Results from a successful Terraform run (terraform apply)
  * To see results after a successful run, use `terraform output [name]`
  */
-
-# Returns the name of the ECR registry, this will be used later in various scripts
-# output "docker_registry" {
-#   value = aws_ecr_repository.app.repository_url
-# }
-
 # Returns the name of the S3 bucket that will be used in later Terraform files
 output "bucket" {
   value = module.tf_remote_state.bucket

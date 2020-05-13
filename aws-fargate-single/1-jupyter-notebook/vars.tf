@@ -5,13 +5,13 @@ variable "aws_region" {
 
 variable "app_image" {
   description = "Docker image to run arc jupyter notebook as an ECS service"
-  default     = "triplai/arc-jupyter:arc-jupyter_2.2.0_scala_2.12_hadoop_2.9.2_1.0.0"
+  default     = "triplai/arc-jupyter"
   # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc-jupyter:athena_scala_2.12"
 }
 
 variable "arc_image" {
   description = "Docker image to run ARC ETL as an ECS task"
-  default     = "triplai/arc:arc_2.10.0_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0"
+  default     = "triplai/arc"
   # default     = "[YOUR_ACCOUNT_ID].dkr.ecr.ap-southeast-2.amazonaws.com/arc:athena_scala_2.12"
 }
 
@@ -21,6 +21,10 @@ variable "container_name" {
   default     = "arc-jupyter"
 }
 
+variable "arc_container_name" {
+  description = "Docker Container name for ARC ETL"
+  default     = "arc-etl"
+}
 
 variable "app_port" {
   description = "Port exposed by the docker image to redirect traffic to"
@@ -47,10 +51,6 @@ variable "az_count" {
   default     = "2"
 }
 
-variable "health_check_path" {
-  default = "/"
-}
-
 variable "fargate_cpu" {
   description = "Fargate instance CPU units to provision (1 vCPU = 1024 CPU units)"
   default     = "1024"
@@ -66,23 +66,3 @@ variable "ecs_s3_bucket" {
   default     = "arcdemo2020"
 }
 
-
-variable "arc_container_name" {
-  description = "Docker Container name for ARC ETL"
-  default     = "arc-etl"
-}
-
-# variable "access_secret_arn" {
-#   description = "secret manager Arn for s3 access secret"
-#   default     = "blahblah"
-# }
-
-# variable "access_key_arn" {
-#   description = "secret manager Arn for s3 access key"
-#   default     = "blahblah"
-# }
-
-# variable "kms_arn" {
-#   description = "s3 KMS arn"
-#   default     = ""
-# }

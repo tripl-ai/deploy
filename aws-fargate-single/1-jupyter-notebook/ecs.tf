@@ -6,9 +6,9 @@ resource "aws_ecs_cluster" "main" {
 
   default_capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
-    weight            = 100
-    base              = 1
+    weight            = 50
   }
+
   tags = {
     Name = "arcdemo_ecs"
   }
@@ -18,19 +18,18 @@ resource "aws_ecs_cluster" "main" {
 # Create ARC Jupyter task definition
 # -----------------------------------------------------
 data "template_file" "arc_jupyter" {
-  # template = file("./templates/ecs/arc_app.json.tpl")
-  template = file("./templates/ecs/arc_app_iam.json.tpl")
+  template = file("./templates/ecs/arc_app.json.tpl")
 
   vars = {
-    container_name = var.container_name
-    app_image      = var.app_image
-    app_port       = var.app_port
-    fargate_cpu    = var.fargate_cpu
-    fargate_memory = var.fargate_memory
-    aws_region     = var.aws_region
-    # access_key_arn    = var.access_key_arn
-    # access_secret_arn = var.access_secret_arn
-    # kms_arn           = var.kms_arn
+    container_name    = var.container_name
+    app_image         = var.app_image
+    app_port          = var.app_port
+    fargate_cpu       = var.fargate_cpu
+    fargate_memory    = var.fargate_memory
+    aws_region        = var.aws_region
+    ecs_s3_bucket     = var.ecs_s3_bucket
+    access_key_arn    = aws_secretsmanager_secret.accesskey.id
+    access_secret_arn = aws_secretsmanager_secret.secret.id
   }
 }
 
@@ -50,8 +49,7 @@ resource "aws_ecs_task_definition" "jupyter" {
 # Create ARC task definition
 # -----------------------------------------------------
 data "template_file" "arc_etl" {
-  # template = file("./templates/ecs/arc_etl.json.tpl")
-  template = file("./templates/ecs/arc_etl_iam.json.tpl")
+  template = file("./templates/ecs/arc_etl.json.tpl")
 
   vars = {
     arc_container_name = var.arc_container_name
@@ -60,9 +58,8 @@ data "template_file" "arc_etl" {
     fargate_memory     = var.fargate_memory
     aws_region         = var.aws_region
     ecs_s3_bucket      = var.ecs_s3_bucket
-    # access_key_arn     = var.access_key_arn
-    # access_secret_arn  = var.access_secret_arn
-    # kms_arn           = var.kms_arn
+    access_key_arn     = aws_secretsmanager_secret.accesskey.id
+    access_secret_arn  = aws_secretsmanager_secret.secret.id
   }
 }
 
@@ -84,7 +81,11 @@ resource "aws_ecs_service" "main" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.jupyter.arn
   desired_count   = var.app_count
-  launch_type     = "FARGATE"
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+  }
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]

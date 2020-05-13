@@ -41,12 +41,11 @@ $ terraform apply
 | Name | Description | Type | Default | Required |
 |:-----:|-------------|:----:|:-----:|:-----:|
 | region | The region where you want to deploy the application| string | `ap-southeast-2` | yes |
-| filterprefix | Lambda function invoke prefix for S3 Object Create or put | string | `job` | yes |
-| filtersuffix | A file extension name as a Lambda function invoke suffix | string | `.ipynb`| yes |
+| filterprefix | Lambda function invoke prefix for S3 Object Create or put | string | `appcode/job` | yes |
+| filtersuffix | A file extension name as a Lambda function invoke suffix | string | `ipynb`| yes |
 | lambda\_source\_package | compressed Lambda function source file name | string | `lambda_func.js.zip` | yes |
 | s3\_bucket\_name | S3 bucket name where you want to create notification event | string | `arcdemo2020` | yes |
 | ecs\_cluster\_name | ECS cluster name that hosts the ARC ETL task | string | `arc-cluster` | yes |
-| ecs\_task\_name | An ECS task definition name | string | `arc-etl-task` | yes |
 | ecs\_container\_name | Container name in an ECS task | string | `arc-etl` | yes |
 | is_stream | indicator of streaming or batch data process | string | `false` | yes |
 
