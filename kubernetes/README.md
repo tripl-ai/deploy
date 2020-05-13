@@ -35,7 +35,7 @@ kubectl cluster-info
 You can load a local docker image into `kind` like this so you could easily load a custom version of the Arc image. If you don't do this Kubernetes will try to download the image again from the docker registry on each machine which is disallowed:
 
 ```bash
-kind load docker-image triplai/arc:arc_2.10.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+kind load docker-image triplai/arc:arc_2.12.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
 ```
 
 ## Set Up Argo
