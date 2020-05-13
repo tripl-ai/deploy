@@ -8,7 +8,7 @@ spec:
 
   - name: createId
     script:
-      image: triplai/arc:arc_2.10.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+      image: triplai/arc:arc_2.12.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
       command: [python3]
       source: |
         import uuid
@@ -19,7 +19,7 @@ spec:
       # override defaults here
       parameters:
       - name: image
-        value: triplai/arc:arc_2.10.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+        value: triplai/arc:arc_2.12.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
       - name: driverCores
         value: 1
       - name: driverMemory
