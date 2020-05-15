@@ -244,7 +244,7 @@ spec:
       command: ["/usr/bin/python3"]
       source: |
         # this script takes an input executionId and namespace and removes an exposed service
-
+        
         import sys
         from kubernetes import client, config
 
