@@ -72,6 +72,40 @@ To start the Argo UI accessible via [http://localhost:2746](http://localhost:274
 argo server
 ```
 
+## Set up Jupyter Hub
+
+Create a `namespace` for `JupyterHub`:
+
+```bash
+kubectl create namespace jhub
+```
+
+You will need [helm](https://helm.sh/) so install it:
+
+```bash
+brew install helm
+```
+
+Then execute the `helm` chart:
+
+```bash
+helm install jhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jhub --values jupyterhub/config.yaml
+```
+
+Jupyterhub is configured by overriding values in the `helm` chart. See the file at `jupyterhub/config.yaml`. If you update the `config.yaml` it can be re-applied via:
+
+```bash
+helm upgrade jhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jhub --values jupyterhub/config.yaml
+```
+
+**TODO**:
+
+```bash
+kind load docker-image triplai/arc-jupyter:arc-jupyter_2.4.0_scala_2.12_hadoop_2.9.2_1.0.0
+kubectl create serviceaccount mike --namespace jhub
+kubectl port-forward --namespace=jhub proxy-6b54c75b6b-hxfvm  8000:8000
+```
+
 ## Submit an Arc job
 
 First add the Arc workflow templates which define how to execute Arc within Kubernetes. This file should not need to be modified and can be invoked by the execution jobs.
