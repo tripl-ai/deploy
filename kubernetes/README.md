@@ -35,7 +35,7 @@ kubectl cluster-info
 You can load a local docker image into `kind` like this so you could easily load a custom version of the Arc image. If you don't do this Kubernetes will try to download the image again from the docker registry on each machine which is disallowed:
 
 ```bash
-kind load docker-image triplai/arc:arc_2.12.2_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+kind load docker-image triplai/arc:arc_2.12.4_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
 ```
 
 ## Set Up Argo
@@ -77,7 +77,7 @@ argo server
 Create a `namespace` for `JupyterHub`:
 
 ```bash
-kubectl create namespace jhub
+kubectl create namespace jupyterhub
 ```
 
 You will need [helm](https://helm.sh/) so install it:
@@ -89,21 +89,21 @@ brew install helm
 Then execute the `helm` chart:
 
 ```bash
-helm install jhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jhub --values jupyterhub/config.yaml
+helm install jupyterhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jupyterhub --values jupyterhub/config.yaml
 ```
 
 Jupyterhub is configured by overriding values in the `helm` chart. See the file at `jupyterhub/config.yaml`. If you update the `config.yaml` it can be re-applied via:
 
 ```bash
-helm upgrade jhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jhub --values jupyterhub/config.yaml
+helm upgrade jupyterhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jupyterhub --values jupyterhub/config.yaml
 ```
 
 **TODO**:
 
 ```bash
-kind load docker-image triplai/arc-jupyter:arc-jupyter_2.4.0_scala_2.12_hadoop_2.9.2_1.0.0
-kubectl create serviceaccount mike --namespace jhub
-kubectl port-forward --namespace=jhub proxy-6b54c75b6b-hxfvm  8000:8000
+kind load docker-image triplai/arc-jupyter:arc-jupyter_2.4.1_scala_2.12_hadoop_2.9.2_1.0.0
+kubectl create serviceaccount mike --namespace jupyterhub
+kubectl port-forward --namespace=jupyterhub proxy-6b54c75b6b-wdb6j 8000:8000
 ```
 
 ## Submit an Arc job
