@@ -5,10 +5,9 @@ metadata:
 spec:
 
   templates:
-
   - name: createId
     script:
-      image: triplai/arc:arc_2.12.4_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+      image: triplai/arc:arc_3.2.0_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.0.0
       command: [python3]
       source: |
         import uuid
@@ -19,7 +18,7 @@ spec:
       # override defaults here
       parameters:
       - name: image
-        value: triplai/arc:arc_2.12.4_spark_2.4.5_scala_2.12_hadoop_2.9.2_1.0.0
+        value: triplai/arc:arc_3.2.0_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.0.0
       - name: driverCores
         value: 1
       - name: driverMemory
@@ -31,7 +30,7 @@ spec:
       - name: executorMemory
         value: 1G
       - name: pullPolicy
-        value: Never
+        value: Always
       - name: sparkConf
         value: ""
       - name: configUri
@@ -96,8 +95,8 @@ spec:
             value: "{{inputs.parameters.image}}"
           - name: executionId
             value: "{{tasks.executionId.outputs.result}}"
-          - name: status
-            value: "{{tasks.arc.status}}"
+          - name: exitCode
+            value: "{{tasks.arc.exitCode}}"
         continueOn:
           failed: false
 
@@ -114,10 +113,14 @@ spec:
       image: "{{inputs.parameters.image}}"
       command: ["/usr/bin/python3"]
       source: |
-        # this script takes an input executionId and namespace and creates an exposed service
-        # with hostname "arc-{executionId}-driver.{namespace}.svc.cluster.local"
+        # this script takes an input executionId and namespace and creates a headless service
+        # with hostname 'arc-{executionId}-driver.{namespace}.svc.cluster.local'
+        # this allows the executors to communicate to the driver
+        # see https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
 
         import sys
+        import socket
+        import time
         from kubernetes import client, config
 
         # bind input variables
@@ -131,27 +134,27 @@ spec:
 
         # create meta
         meta = client.V1ObjectMeta()
-        meta.name=f"arc-{executionId}-driver"
+        meta.name=f'arc-{executionId}-driver'
         meta.workflowId=workflowId
         meta.executionId=executionId
 
         # create spec
         spec = client.V1ServiceSpec()
-        spec.cluster_ip = "None"
+        spec.cluster_ip = 'None'
         spec.selector = {
-          "executionId": executionId
+          'executionId': executionId
         }
 
         # expose ports
-        driver_port = client.V1ServicePort(protocol="TCP", port=7078, target_port=7078, name="spark-driver-port")
-        blockmanager_port = client.V1ServicePort(protocol="TCP", port=7079, target_port=7079, name="spark-blockmanager-port")
+        driver_port = client.V1ServicePort(protocol='TCP', port=7078, target_port=7078, name='spark-driver-port')
+        blockmanager_port = client.V1ServicePort(protocol='TCP', port=7079, target_port=7079, name='spark-blockmanager-port')
         spec.ports = [driver_port, blockmanager_port]
 
         # create service
         service = client.V1Service()
-        service.api_version = "v1"
-        service.kind = "Service"
-        service.type = "ClusterIP"
+        service.api_version = 'v1'
+        service.kind = 'Service'
+        service.type = 'ClusterIP'
         service.spec = spec
         service.metadata = meta
 
@@ -188,11 +191,9 @@ spec:
         # verbose logging
         set -ex
 
-        # todo: for spark 3.0
-        # --conf spark.authenticate=true \
-        # --conf spark.io.encryption.enabled=true \
-        # --conf spark.network.crypto.enabled=true \
-        # --conf spark.kubernetes.local.dirs.tmpfs=true \
+        # wait for service to become available
+        # if it does not after 30 seconds the spark-submit will fail anyway
+        for i in {1..30}; do host arc-{{inputs.parameters.executionId}}-driver.{{workflow.namespace}}.svc.cluster.local && break || sleep 1; done
 
         # submit job
         bin/spark-submit \
@@ -200,33 +201,40 @@ spec:
         --deploy-mode client \
         --class ai.tripl.arc.ARC \
         --name arc \
+        --conf spark.authenticate=true \
         --conf spark.blockManager.port=7079 \
-        --conf spark.driver.extraJavaOptions="-XX:+UseG1GC -XX:-UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" \
+        --conf spark.driver.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.driver.host=arc-{{inputs.parameters.executionId}}-driver.{{workflow.namespace}}.svc.cluster.local  \
         --conf spark.driver.memory={{inputs.parameters.driverMemory}} \
-        --conf spark.driver.pod.name=arc-{{inputs.parameters.executionId}}-driver \
+        --conf spark.driver.pod.name=$(hostname) \
         --conf spark.driver.port=7078 \
         --conf spark.executor.cores={{inputs.parameters.executorCores}} \
-        --conf spark.executor.extraJavaOptions="-XX:+UseG1GC -XX:-UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" \
+        --conf spark.executor.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.executor.instances={{inputs.parameters.executorInstances}} \
         --conf spark.executor.memory={{inputs.parameters.executorMemory}} \
+        --conf spark.io.encryption.enabled=true \
         --conf spark.kubernetes.authenticate.caCertFile=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+        --conf spark.kubernetes.authenticate.driver.serviceAccountName={{workflow.serviceAccountName}} \
         --conf spark.kubernetes.authenticate.oauthTokenFile=/var/run/secrets/kubernetes.io/serviceaccount/token \
         --conf spark.kubernetes.container.image.pullPolicy={{inputs.parameters.pullPolicy}} \
         --conf spark.kubernetes.container.image={{inputs.parameters.image}} \
         --conf spark.kubernetes.driver.limit.cores={{inputs.parameters.driverCores}} \
+        --conf spark.kubernetes.driver.pod.name=$(hostname) \
+        --conf spark.kubernetes.executor.label.executionId={{inputs.parameters.executionId}} \
+        --conf spark.kubernetes.executor.label.workflowId={{workflow.uid}} \
         --conf spark.kubernetes.executor.limit.cores={{inputs.parameters.executorCores}} \
-        --conf spark.kubernetes.executor.podNamePrefix=arc-{{inputs.parameters.executionId}}-executor \
+        --conf spark.kubernetes.executor.podNamePrefix=$(hostname)-spark \
         --conf spark.kubernetes.executor.request.cores={{inputs.parameters.executorCores}} \
         --conf spark.kubernetes.local.dirs.tmpfs=false \
         --conf spark.kubernetes.namespace={{workflow.namespace}} \
-        --conf spark.rdd.compress=true \
-        --conf spark.sql.cbo.enabled=true \
-        --conf spark.ui.enabled=false \
+        --conf spark.network.crypto.enabled=true \
+        --conf spark.ui.enabled=true \
+        --conf spark.sql.cbo.enabled=false \
+        --conf spark.sql.adaptive.enabled=false \
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
         --etl.config.uri={{inputs.parameters.configUri}} \
-        --etl.config.tags="workflowId={{workflow.uid}} executionId={{inputs.parameters.executionId}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
+        --etl.config.tags="workflowId={{workflow.uid}} executionId={{inputs.parameters.executionId}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
         {{inputs.parameters.parameters}}
 
   - name: deleteNamespacedService
@@ -234,7 +242,7 @@ spec:
       parameters:
       - name: image
       - name: executionId
-      - name: status
+      - name: exitCode
     metadata:
       labels:
         workflowId: "{{workflow.uid}}"
@@ -244,23 +252,23 @@ spec:
       command: ["/usr/bin/python3"]
       source: |
         # this script takes an input executionId and namespace and removes an exposed service
-        
+        # it is the equivalent to a 'finally' in a 'try-catch-finally' pattern as it will be executed regardless
+        # of the outcome of the arc stage due to the 'continueOn: failed: true' condition.
+
         import sys
         from kubernetes import client, config
 
         # bind input variables
         executionId = '{{inputs.parameters.executionId}}'
         namespace = '{{workflow.namespace}}'
-        status = '{{inputs.parameters.status}}'
+        exitCode = int('{{inputs.parameters.exitCode}}')
 
         # load injected service account details
         config.load_incluster_config()
         api_instance = client.CoreV1Api()
 
-        api_response = api_instance.delete_namespaced_service(f"arc-{executionId}-driver", namespace)
+        api_response = api_instance.delete_namespaced_service(f'arc-{executionId}-driver', namespace)
         print(api_response)
 
-        # return the exit code of the arcSubmit container which has continueOn: failed: true
-        # replace with exitCode https://github.com/argoproj/argo/pull/2111/files once released
-        # sys.exit(int(exitCode))
-        sys.exit(0) if status == 'Succeeded' else sys.exit(1)
+        # return the exitCode from the arc stage as the final job outcome
+        sys.exit(exitCode)
