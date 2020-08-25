@@ -21,22 +21,19 @@ spec:
         value: 1
       - name: executorMemory
         value: 1G
-      - name: pullPolicy
-        value: Always
       - name: sparkConf
         value: ""
       - name: tags
         value: ""
       - name: parameters
         value: ""
+      - name: pullPolicy
+        value: Always
     metadata:
       labels:
         workflowId: "{{workflow.uid}}"
     script:
       image: "{{inputs.parameters.image}}"
-      env:
-      - name: ETL_CONF_ENV
-        value: "{{workflow.namespace}}"
       command: ["/bin/sh"]
       source: |
         # verbose logging
@@ -84,5 +81,6 @@ spec:
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
         --etl.config.uri={{inputs.parameters.configUri}} \
-        --etl.config.tags="workflowId={{workflow.uid}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
+        --etl.config.environment={{workflow.namespace}} \
+        --etl.config.tags="service=arc workflowId={{workflow.uid}} pod={{pod.name}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
         {{inputs.parameters.parameters}}
