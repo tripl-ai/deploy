@@ -142,7 +142,7 @@ spec:
         spec = client.V1ServiceSpec()
         spec.cluster_ip = 'None'
         spec.selector = {
-          'executionId': executionId
+          'driverId': executionId
         }
 
         # expose ports
@@ -179,6 +179,7 @@ spec:
     metadata:
       labels:
         hostname: "arc-{{inputs.parameters.executionId}}-driver"
+        driverId: "{{inputs.parameters.executionId}}"
         workflowId: "{{workflow.uid}}"
         executionId: "{{inputs.parameters.executionId}}"
     script:
@@ -190,6 +191,9 @@ spec:
       source: |
         # verbose logging
         set -ex
+
+        # print current hostname
+        hostname -I
 
         # wait for service to become available
         # if it does not after 30 seconds the spark-submit will fail anyway
