@@ -8,13 +8,10 @@ spec:
     inputs:
       # override defaults here
       parameters:
+      - name: jobId
       - name: configUri
       - name: image
         value: triplai/arc:arc_3.2.0_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.0.0
-      - name: driverCores
-        value: 1
-      - name: driverMemory
-        value: 1G
       - name: executorInstances
         value: 1
       - name: executorCores
@@ -33,6 +30,13 @@ spec:
       labels:
         workflowId: "{{workflow.uid}}"
     script:
+      resources:
+        limits:
+          cpu: "1"
+          memory: "2.5Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
       image: "{{inputs.parameters.image}}"
       command: ["/bin/sh"]
       source: |
@@ -53,7 +57,7 @@ spec:
         --conf spark.blockManager.port=7079 \
         --conf spark.driver.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.driver.host=$(hostname -I)  \
-        --conf spark.driver.memory={{inputs.parameters.driverMemory}} \
+        --conf spark.driver.memory=2G \
         --conf spark.driver.pod.name=$(hostname) \
         --conf spark.driver.port=7078 \
         --conf spark.executor.cores={{inputs.parameters.executorCores}} \
@@ -66,7 +70,7 @@ spec:
         --conf spark.kubernetes.authenticate.oauthTokenFile=/var/run/secrets/kubernetes.io/serviceaccount/token \
         --conf spark.kubernetes.container.image.pullPolicy={{inputs.parameters.pullPolicy}} \
         --conf spark.kubernetes.container.image={{inputs.parameters.image}} \
-        --conf spark.kubernetes.driver.limit.cores={{inputs.parameters.driverCores}} \
+        --conf spark.kubernetes.driver.limit.cores=1 \
         --conf spark.kubernetes.driver.pod.name=$(hostname) \
         --conf spark.kubernetes.executor.label.workflowId={{workflow.uid}} \
         --conf spark.kubernetes.executor.limit.cores={{inputs.parameters.executorCores}} \
@@ -78,9 +82,13 @@ spec:
         --conf spark.ui.enabled=true \
         --conf spark.sql.cbo.enabled=false \
         --conf spark.sql.adaptive.enabled=false \
+        --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+        --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+        --conf spark.default.parallelism=$(({{inputs.parameters.executorCores}} * 10)) \
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
         --etl.config.uri={{inputs.parameters.configUri}} \
+        --etl.config.job.id={{inputs.parameters.jobId}} \
         --etl.config.environment={{workflow.namespace}} \
         --etl.config.tags="service=arc workflowId={{workflow.uid}} pod={{pod.name}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
         {{inputs.parameters.parameters}}
