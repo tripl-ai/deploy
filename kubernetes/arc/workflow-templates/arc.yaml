@@ -11,7 +11,7 @@ spec:
       - name: jobId
       - name: configUri
       - name: image
-        value: triplai/arc:arc_3.2.0_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.0.0
+        value: ghcr.io/tripl-ai/arc:arc_3.3.2_spark_3.0.1_scala_2.12_hadoop_3.2.0_1.0.0
       - name: executorInstances
         value: 1
       - name: executorCores
@@ -32,7 +32,6 @@ spec:
     script:
       resources:
         limits:
-          cpu: "1"
           memory: "2.5Gi"
         requests:
           cpu: "1"
@@ -54,12 +53,10 @@ spec:
         --class ai.tripl.arc.ARC \
         --name arc \
         --conf spark.authenticate=true \
-        --conf spark.blockManager.port=7079 \
         --conf spark.driver.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.driver.host=$(hostname -I)  \
         --conf spark.driver.memory=2G \
         --conf spark.driver.pod.name=$(hostname) \
-        --conf spark.driver.port=7078 \
         --conf spark.executor.cores={{inputs.parameters.executorCores}} \
         --conf spark.executor.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.executor.instances={{inputs.parameters.executorInstances}} \
@@ -82,8 +79,74 @@ spec:
         --conf spark.ui.enabled=true \
         --conf spark.sql.cbo.enabled=false \
         --conf spark.sql.adaptive.enabled=false \
-        --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
-        --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+        --conf spark.default.parallelism=$(({{inputs.parameters.executorCores}} * 10)) \
+        {{inputs.parameters.sparkConf}} \
+        local:///opt/spark/jars/arc.jar \
+        --etl.config.uri={{inputs.parameters.configUri}} \
+        --etl.config.job.id={{inputs.parameters.jobId}} \
+        --etl.config.environment={{workflow.namespace}} \
+        --etl.config.tags="service=arc workflowId={{workflow.uid}} pod={{pod.name}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
+        {{inputs.parameters.parameters}}
+
+  - name: arcLocal
+    inputs:
+      # override defaults here
+      parameters:
+      - name: jobId
+      - name: configUri
+      - name: image
+        value: ghcr.io/tripl-ai/arc:arc_3.3.2_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.1.0
+      - name: executorInstances
+        value: 1
+      - name: executorCores
+        value: 1
+      - name: executorMemory
+        value: 1G
+      - name: sparkConf
+        value: ""
+      - name: tags
+        value: ""
+      - name: parameters
+        value: ""
+      - name: pullPolicy
+        value: Always
+    metadata:
+      labels:
+        workflowId: "{{workflow.uid}}"
+    podSpecPatch: |
+      containers:
+        - name: main
+          resources:
+            limits:
+              memory: "{{inputs.parameters.executorMemory}}i"
+            requests:
+              cpu: "{{inputs.parameters.executorCores}}"
+              memory: "{{inputs.parameters.executorMemory}}i"
+    script:
+      image: "{{inputs.parameters.image}}"
+      command: ["/bin/sh"]
+      source: |
+        # verbose logging
+        set -ex
+
+        # print current hostname and ip
+        hostname
+        hostname -I
+
+        # submit job
+        bin/spark-submit \
+        --master local[{{inputs.parameters.executorCores}}] \
+        --driver-memory {{inputs.parameters.executorMemory}} \
+        --driver-java-options "-XX:+UseG1GC" \
+        --class ai.tripl.arc.ARC \
+        --name arc \
+        --conf spark.driver.host=$(hostname -I)  \
+        --conf spark.driver.pod.name=$(hostname) \
+        --conf spark.io.encryption.enabled=true \
+        --conf spark.network.crypto.enabled=true \
+        --conf spark.ui.enabled=true \
+        --conf spark.sql.cbo.enabled=false \
+        --conf spark.sql.adaptive.enabled=false \
         --conf spark.default.parallelism=$(({{inputs.parameters.executorCores}} * 10)) \
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
