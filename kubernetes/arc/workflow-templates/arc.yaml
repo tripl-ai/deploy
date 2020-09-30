@@ -11,13 +11,13 @@ spec:
       - name: jobId
       - name: configUri
       - name: image
-        value: ghcr.io/tripl-ai/arc:arc_3.3.2_spark_3.0.1_scala_2.12_hadoop_3.2.0_1.0.0
+        value: ghcr.io/tripl-ai/arc:arc_3.4.0_spark_3.0.1_scala_2.12_hadoop_3.2.0_1.1.0
       - name: executorInstances
-        value: 1
+        value: "1"
       - name: executorCores
-        value: 1
+        value: "1"
       - name: executorMemory
-        value: 1G
+        value: "1"
       - name: sparkConf
         value: ""
       - name: tags
@@ -31,11 +31,9 @@ spec:
         workflowId: "{{workflow.uid}}"
     script:
       resources:
-        limits:
-          memory: "2.5Gi"
         requests:
           cpu: "1"
-          memory: "2Gi"
+          memory: "1Gi"
       image: "{{inputs.parameters.image}}"
       command: ["/bin/sh"]
       source: |
@@ -55,7 +53,7 @@ spec:
         --conf spark.authenticate=true \
         --conf spark.driver.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.driver.host=$(hostname -I)  \
-        --conf spark.driver.memory=2G \
+        --conf spark.driver.memory=921m \
         --conf spark.driver.pod.name=$(hostname) \
         --conf spark.executor.cores={{inputs.parameters.executorCores}} \
         --conf spark.executor.extraJavaOptions="-XX:+UseG1GC" \
@@ -77,9 +75,6 @@ spec:
         --conf spark.kubernetes.namespace={{workflow.namespace}} \
         --conf spark.network.crypto.enabled=true \
         --conf spark.ui.enabled=true \
-        --conf spark.sql.cbo.enabled=false \
-        --conf spark.sql.adaptive.enabled=false \
-        --conf spark.default.parallelism=$(({{inputs.parameters.executorCores}} * 10)) \
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
         --etl.config.uri={{inputs.parameters.configUri}} \
@@ -95,13 +90,13 @@ spec:
       - name: jobId
       - name: configUri
       - name: image
-        value: ghcr.io/tripl-ai/arc:arc_3.3.2_spark_3.0.0_scala_2.12_hadoop_3.2.0_1.1.0
+        value: ghcr.io/tripl-ai/arc:arc_3.3.2_spark_3.0.1_scala_2.12_hadoop_3.2.0_1.0.0
       - name: executorInstances
-        value: 1
+        value: "1"
       - name: executorCores
-        value: 1
+        value: "1"
       - name: executorMemory
-        value: 1G
+        value: "1"
       - name: sparkConf
         value: ""
       - name: tags
@@ -117,11 +112,9 @@ spec:
       containers:
         - name: main
           resources:
-            limits:
-              memory: "{{inputs.parameters.executorMemory}}i"
             requests:
               cpu: "{{inputs.parameters.executorCores}}"
-              memory: "{{inputs.parameters.executorMemory}}i"
+              memory: "{{inputs.parameters.executorMemory}}Gi"
     script:
       image: "{{inputs.parameters.image}}"
       command: ["/bin/sh"]
@@ -134,9 +127,10 @@ spec:
         hostname -I
 
         # submit job
+        # driver memory is set at 90% of executorMemory
         bin/spark-submit \
         --master local[{{inputs.parameters.executorCores}}] \
-        --driver-memory {{inputs.parameters.executorMemory}} \
+        --driver-memory $(({{inputs.parameters.executorMemory}} * 1024 * 90/100))m \
         --driver-java-options "-XX:+UseG1GC" \
         --class ai.tripl.arc.ARC \
         --name arc \
@@ -145,9 +139,6 @@ spec:
         --conf spark.io.encryption.enabled=true \
         --conf spark.network.crypto.enabled=true \
         --conf spark.ui.enabled=true \
-        --conf spark.sql.cbo.enabled=false \
-        --conf spark.sql.adaptive.enabled=false \
-        --conf spark.default.parallelism=$(({{inputs.parameters.executorCores}} * 10)) \
         {{inputs.parameters.sparkConf}} \
         local:///opt/spark/jars/arc.jar \
         --etl.config.uri={{inputs.parameters.configUri}} \
