@@ -58,7 +58,7 @@ spec:
         --conf spark.executor.cores={{inputs.parameters.executorCores}} \
         --conf spark.executor.extraJavaOptions="-XX:+UseG1GC" \
         --conf spark.executor.instances={{inputs.parameters.executorInstances}} \
-        --conf spark.executor.memory={{inputs.parameters.executorMemory}} \
+        --conf spark.executor.memory={{inputs.parameters.executorMemory}}G \
         --conf spark.io.encryption.enabled=true \
         --conf spark.kubernetes.authenticate.caCertFile=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
         --conf spark.kubernetes.authenticate.driver.serviceAccountName={{workflow.serviceAccountName}} \
@@ -81,6 +81,7 @@ spec:
         --etl.config.job.id={{inputs.parameters.jobId}} \
         --etl.config.environment={{workflow.namespace}} \
         --etl.config.tags="service=arc workflowId={{workflow.uid}} pod={{pod.name}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
+        --ETL_CONF_EPOCH=$(date '+%s') --ETL_CONF_TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
         {{inputs.parameters.parameters}}
 
   - name: arcLocal
@@ -145,4 +146,5 @@ spec:
         --etl.config.job.id={{inputs.parameters.jobId}} \
         --etl.config.environment={{workflow.namespace}} \
         --etl.config.tags="service=arc workflowId={{workflow.uid}} pod={{pod.name}} serviceAccount={{workflow.serviceAccountName}} namespace={{workflow.namespace}} {{inputs.parameters.tags}}" \
+        --ETL_CONF_EPOCH=$(date '+%s') --ETL_CONF_TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ') \
         {{inputs.parameters.parameters}}
