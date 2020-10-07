@@ -20,14 +20,14 @@ auth:
 singleuser:
   image:
     name: triplai/arc-jupyter
-    tag: arc-jupyter_2.4.1_scala_2.12_hadoop_2.9.2_1.0.0
-    pullPolicy: Never
+    tag: latest
+    pullPolicy: Always
   serviceAccountName: "{username}"
   storage:
     type: none
   memory:
     limit: 4G
-    guarantee: 4G 
+    guarantee: 4G
   extraEnv:
     JAVA_OPTS: -Xmx4G
   profileList:
@@ -35,7 +35,8 @@ singleuser:
       description: "Arc-Jupyter Development Environment"
       default: true
       kubespawner_override:
-        image: triplai/arc-jupyter:arc-jupyter_2.4.1_scala_2.12_hadoop_2.9.2_1.0.0
+        image: triplai/arc-jupyter:latest
+        port: 8080
         # copy in the notebook customisations
         lifecycle_hooks:
           postStart:

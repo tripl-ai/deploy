@@ -111,6 +111,7 @@ kubectl port-forward --namespace=jupyterhub proxy-6b54c75b6b-wdb6j 8000:8000
 First add the Arc workflow templates which define how to execute Arc within Kubernetes. This file should not need to be modified and can be invoked by the execution jobs.
 
 ```bash
+argo template delete arc
 argo template create arc/workflow-templates/arc.yaml
 ```
 
