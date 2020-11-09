@@ -89,13 +89,13 @@ brew install helm
 Then execute the `helm` chart:
 
 ```bash
-helm install jupyterhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jupyterhub --values jupyterhub/config.yaml
+helm install jupyterhub jupyterhub/jupyterhub-0.10.2.tgz --namespace test --values jupyterhub/config.yaml
 ```
 
 Jupyterhub is configured by overriding values in the `helm` chart. See the file at `jupyterhub/config.yaml`. If you update the `config.yaml` it can be re-applied via:
 
 ```bash
-helm upgrade jupyterhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jupyterhub --values jupyterhub/config.yaml
+helm upgrade jupyterhub jupyterhub/jupyterhub-0.10.2.tgz --namespace jupyterhub --values jupyterhub/config.yaml
 ```
 
 **TODO**:
@@ -103,7 +103,7 @@ helm upgrade jupyterhub jupyterhub/jupyterhub-0.9.0.tgz --namespace jupyterhub -
 ```bash
 kind load docker-image triplai/arc-jupyter:arc-jupyter_2.4.1_scala_2.12_hadoop_2.9.2_1.0.0
 kubectl create serviceaccount mike --namespace jupyterhub
-kubectl port-forward --namespace=jupyterhub proxy-6b54c75b6b-wdb6j 8000:8000
+kubectl port-forward --namespace=jupyterhub proxy-64d68d95d8-r8vzd  8000:8000
 ```
 
 ## Submit an Arc job

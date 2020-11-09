@@ -3,7 +3,7 @@ hub:
     type: sqlite-memory
   extraConfig:
     overrideServiceAccount: |
-      # this script allows serviceAccountName to use dynamic naming based on {username}"
+      # this script allows serviceAccountName to use dynamic naming based on {unescaped_username}"
       async def override_service_account_hook(kube_spawner):
         if kube_spawner.service_account is not None:
           kube_spawner.service_account = kube_spawner._expand_user_properties(kube_spawner.service_account)
@@ -11,25 +11,31 @@ hub:
       c.KubeSpawner.pre_spawn_hook = override_service_account_hook
 
 proxy:
-  secretToken: "37d978c42bd042da78a1afa5a32dacaaee863ded4926eca2b30cc3005832d636"
+  secretToken: "27218f0e5e27d110aefb2ba3578c8f3ad40cc7d7c544bd04d92b879bf8a82305"
 
 auth:
   dummy:
     password: "password"
 
 singleuser:
+  defaultUrl: "/lab"
   image:
     name: triplai/arc-jupyter
     tag: latest
     pullPolicy: Always
-  serviceAccountName: "{username}"
+  serviceAccountName: "{unescaped_username}"
   storage:
     type: none
+  cpu:
+    guarantee: 16
   memory:
-    limit: 4G
-    guarantee: 4G
+    guarantee: 32G
   extraEnv:
-    JAVA_OPTS: -Xmx4G
+    JAVA_OPTS: -Xmx30G
+  lifecycle_hooks:
+    postStart:
+      exec:
+        command: ["cp", "-r", "/opt/.jupyter", "/home/jovyan/.jupyter"]
   profileList:
     - display_name: "Arc"
       description: "Arc-Jupyter Development Environment"
@@ -37,8 +43,4 @@ singleuser:
       kubespawner_override:
         image: triplai/arc-jupyter:latest
         port: 8080
-        # copy in the notebook customisations
-        lifecycle_hooks:
-          postStart:
-            exec:
-              command: ["cp", "-r", "/opt/.jupyter", "/home/jovyan/.jupyter"]
+
