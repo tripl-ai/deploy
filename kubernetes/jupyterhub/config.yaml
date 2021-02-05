@@ -32,10 +32,16 @@ singleuser:
     guarantee: 32G
   extraEnv:
     JAVA_OPTS: -Xmx30G
-  lifecycle_hooks:
+  lifecycleHooks:
     postStart:
       exec:
-        command: ["cp", "-r", "/opt/.jupyter", "/home/jovyan/.jupyter"]
+        command:
+          - "bash"
+          - "-c"
+          - >
+            cp -r /opt/.jupyter $HOME/.jupyter;
+            echo "git clone https://github.com/tripl-ai/deploy";
+            git clone -b jupyterhub --single-branch https://github.com/tripl-ai/deploy;  
   profileList:
     - display_name: "Arc"
       description: "Arc-Jupyter Development Environment"
