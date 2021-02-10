@@ -89,7 +89,7 @@ brew install helm
 Then execute the `helm` chart:
 
 ```bash
-helm install jupyterhub jupyterhub/jupyterhub-0.10.2.tgz --namespace test --values jupyterhub/config.yaml
+helm install jupyterhub jupyterhub/jupyterhub-0.10.2.tgz --namespace jupyterhub --values jupyterhub/config.yaml
 ```
 
 Jupyterhub is configured by overriding values in the `helm` chart. See the file at `jupyterhub/config.yaml`. If you update the `config.yaml` it can be re-applied via:
