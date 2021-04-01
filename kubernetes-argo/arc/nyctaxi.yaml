@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: ncytaxi-
+spec:
+  entrypoint: ncytaxi
+  templates:
+  - name: ncytaxi
+    dag:
+      tasks:
+        - name: ncytaxi
+          templateRef:
+            name: arc
+            template: arc
+          arguments:
+            parameters:
+            - name: serviceAccountName
+              value: default
+            - name: environment
+              value: production
+            - name: jobId
+              value: 9c9bd290-aedb-4ed7-b8ba-343034edbbd1
+            - name: configUri
+              value: https://raw.githubusercontent.com/tripl-ai/arc-starter/master/examples/kubernetes/nyctaxi.ipynb
+            - name: parameters
+              value: "--ETL_CONF_DATA_URL=s3a://nyc-tlc/trip*data --ETL_CONF_JOB_URL=https://raw.githubusercontent.com/tripl-ai/arc-starter/master/examples/kubernetes"

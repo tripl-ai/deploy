@@ -1,0 +1,59 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: arc
+  namespace: default
+spec:
+  type: Scala
+  mode: cluster
+  image: "ghcr.io/tripl-ai/arc:arc_3.8.2_spark_3.0.2_scala_2.12_hadoop_3.2.0_1.2.0"
+  imagePullPolicy: Always
+  mainClass: ai.tripl.arc.ARC
+  mainApplicationFile: "local:///opt/spark/jars/arc.jar"
+  sparkVersion: "3.0.0"
+  restartPolicy:
+    type: Never
+  volumes:
+    - name: "test-volume"
+      hostPath:
+        path: "/tmp"
+        type: Directory
+  arguments:
+    - "--etl.config.uri=https://raw.githubusercontent.com/tripl-ai/arc-starter/master/examples/kubernetes/nyctaxi.ipynb"
+    - "--etl.config.environment=production"
+    - "--ETL_CONF_DATA_URL=s3a://nyc-tlc/trip*data"
+    - "--ETL_CONF_JOB_URL=https://raw.githubusercontent.com/tripl-ai/arc-starter/master/examples/kubernetes"
+  sparkConf:
+    spark.authenticate: "true"
+    spark.io.encryption.enabled: "true"
+    spark.network.crypto.enabled: "true"
+    spark.rdd.compress: "true"
+    spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+    spark.kryoserializer.buffer.max: "256m"
+    spark.sql.cbo.enabled: "true"
+    spark.sql.decimalOperations.allowPrecisionLoss: "false"
+    spark.sql.adaptive.enabled: "false"
+    spark.hadoop.fs.gs.impl: "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem"
+    spark.hadoop.fs.AbstractFileSystem.gs.impl: "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS"
+    spark.databricks.delta.properties.defaults.enableExpiredLogCleanup: "false"
+  driver:
+    cores: 1
+    coreLimit: "1200m"
+    memory: "1024m"
+    labels:
+      version: 3.0.0
+    serviceAccount: spark
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"
+    javaOptions: "-XX:+UseG1GC -Dlog4j.configuration=file:///etc/spark/conf/log4j.properties"
+  executor:
+    cores: 1
+    instances: 1
+    memory: "4096m"
+    labels:
+      version: 3.0.0
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"
+    javaOptions: "-XX:+UseG1GC"

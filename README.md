@@ -2,15 +2,17 @@
 
 ## Kubernetes
 
-This example shows how to set up a local Kuberetes cluster and deploy jobs using Argo:
+These examples show how to run against a Kuberetes cluster:
 
-- [kubernetes](https://github.com/tripl-ai/deploy/tree/master/kubernetes) for running on Kubernetes.
+- [kubernetes-argo](https://github.com/tripl-ai/deploy/tree/master/kubernetes-argo) for running on Kubernetes and deploy jobs using [Argo](https://argoproj.github.io/) workflows.
+- [jupyterhub-for-kubernetes](https://github.com/tripl-ai/deploy/tree/master/jupyterhub-for-kubernetes) for running on JupyterHub on Kubernetes to build Arc jobs.
+- [spark-on-k8s-operator](https://github.com/tripl-ai/deploy/tree/master/spark-on-k8s-operator) for running on Kubernetes with the [spark-on-k8s-operator](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator).
 
 ## AWS
 
 These are example [Terraform](https://www.terraform.io/) scripts to demonstrate how to execute Arc against a remote cluster.
 
-- [aws-single-master](https://github.com/tripl-ai/deploy/tree/master/aws-single-master) for a single instance. 
+- [aws-single-master](https://github.com/tripl-ai/deploy/tree/master/aws-single-master) for a single instance.
 - [aws-cluster](https://github.com/tripl-ai/deploy/tree/master/aws-cluster) for a multi-instance cluster.
 - [aws-fargate-single](https://github.com/tripl-ai/deploy/tree/master/aws-fargate-single) for a serverless option.
 

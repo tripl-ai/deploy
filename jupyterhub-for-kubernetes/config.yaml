@@ -1,0 +1,173 @@
+hub:
+  image:
+    name: docker.io/jupyterhub/k8s-hub
+    tag: "0.11.1"
+    pullPolicy: Always
+  db:
+    # currently if the hub goes down everyone will need to re-login and their sessions will be gone
+    # this seems like a resonable behavior given that we want to encourage git usage
+    type: sqlite-memory
+  config:
+    # GoogleOAuthenticator defines the google oauth service so that a 'sign in with google' button can be displayed
+    GoogleOAuthenticator:
+      # these are created in the api/credentials sections of gcp
+      client_id:
+      client_secret:
+      oauth_callback_url: https://jupyter.example.com/hub/oauth_callback
+      # hosted_domain defines the allowed sign in domain (i.e. users of @example.com are allowed)
+      hosted_domain:
+        - example.com
+      # this defines the label the user sees and works like 'Sign in with ${login_service}'
+      login_service: Google
+    JupyterHub:
+      authenticator_class: google
+
+  # this code treats the `singleuser.serviceAccountName` value as a template which can be replaced with a dynamic value.
+  #
+  # this override uses an inbuilt method '_expand_user_properties' which is provided by the kube_spawner
+  # and does string replacement based on a format like '{value}' with some predefined keys which contains '{username}' and '{unescaped_username}'
+  # https://github.com/jupyterhub/kubespawner/blob/2a0ffed69668eae3564c6f0bc50be3afca087940/kubespawner/spawner.py#L1570
+  #
+  # excaping is important as kubernetes requires strict url encoding for a lot of functionality and so the kube_spawner._expand_user_properties handles
+  # that logic
+  extraConfig:
+    overrideServiceAccount: |
+      # this script allows serviceAccountName to use dynamic naming based on {value}"
+      async def override_service_account_hook(kube_spawner):
+        print("invoking override_service_account_hook()")
+
+        # get the username
+        unescaped_username = kube_spawner._expand_user_properties("{unescaped_username}")
+
+        # create an escaped version (i.e. first.last = first-last)
+        escaped_username = unescaped_username.replace(".", "-")
+
+        # override the serviceAccountName with the escaped user value
+        kube_spawner.service_account = escaped_username
+
+        print("kube_spawner.service_account = " + kube_spawner.service_account)
+
+      c.KubeSpawner.pre_spawn_hook = override_service_account_hook
+
+proxy:
+  https:
+    enabled: true
+    type: offload
+  service:
+    type: ClusterIP
+  # this is just a random set of bytes created by `openssl rand -hex 32`
+  # does not need to be massively secure given the layers necessary to get to the cluster anyway
+  secretToken: "6449fcb2cef03a4d45a1efec2607d88f8fed5a38e33f9ae9d40afdb37d81f8b9"
+  chp:
+    image:
+      name: docker.io/jupyterhub/configurable-http-proxy
+      tag: "4.2.2"
+      pullPolicy: Always
+
+singleuser:
+  networkTools:
+    image:
+      name: docker.io/jupyterhub/k8s-network-tools
+      tag: "0.11.1"
+      pullPolicy: Always
+  defaultUrl: "/lab"
+  image:
+    name: ghcr.io/tripl-ai/arc-jupyter
+    tag: arc-jupyter_3.12.1_scala_2.12_hadoop_3.2.0_1.5.0
+    pullPolicy: Always
+  # sometimes the startup time for GCP instances can be long (default 300)
+  startTimeout: 600
+  cloudMetadata:
+    # by default access to the metadata servce needed to get permissions with workload identity
+    # is blocked. this disables allows access to the metadata service.
+    blockWithIptables: false
+  # service account is calculated by the override script
+  serviceAccountName: "{username}"
+  storage:
+    type: none
+  cpu:
+    guarantee: 1
+  memory:
+    guarantee: 2G
+  lifecycleHooks:
+    # we need to verride these commands to (in order):
+    # - copy notebook customisations as the notebook volume overwrites the image ones
+    # - set the git config using the environment variable set by the `override_service_account_hook` function
+    # - clone the repository using the secret added to the container by the `override_service_account_hook` `in extra_container_config`
+    #   the git clone has been set to ignore errors so if there is some reason it cannot reach gitlab the container will still start
+    postStart:
+      exec:
+        command:
+          - "bash"
+          - "-c"
+          - >
+            cp -r /opt/.jupyter $HOME/.jupyter;
+            git config --global user.name "${JUPYTERHUB_USER}";
+            git config --global user.email "${JUPYTERHUB_USER}@example.com";
+  profileList:
+    - display_name: "Arc"
+      # slug needs to be unique to differentiate profileList entries
+      slug: arc_7cpu_30ram
+      description: "7 CPU - 30GB RAM"
+      default: true
+      kubespawner_override:
+        image: ghcr.io/tripl-ai/arc-jupyter:arc-jupyter_3.12.1_scala_2.12_hadoop_3.2.0_1.5.0
+        port: 8080
+        cpu_guarantee: 7
+        mem_guarantee: 30
+        # prevent the autoscaler evicting these as users may be using them
+        extra_annotations:
+          "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+        # try to set default directory - this will work only if the directory exists so requires a gitlab token for all users
+        # notebook_dir: "/home/jovyan/daas"
+        environment:
+          # jvm ram allocation
+          JAVA_OPTS: "-Xmx28G"
+          # master
+          CONF_MASTER: "local[7]"
+          # the default environments used when the user does code autocompletion
+          ETL_CONF_COMPLETION_ENVIRONMENTS: "prod,rc,dev"
+          # maximum number of rows allowed to be returned to user which cannot be increased
+          CONF_MAX_NUM_ROWS: "1000"
+
+# these services control the service which automatically pulls images to the k8s nodes but not very useful with a specific node pool
+prePuller:
+  continuous:
+    enabled: false
+  hook:
+    enabled: false
+
+# these services refer to the ability to have a placeholder service running to reduce startup time but will prevent the autoscaling
+# pool from completely shutting down
+scheduling:
+  userScheduler:
+    enabled: false
+  userPlaceholder:
+    enabled: true
+
+# this section creates the ingress that is used to configure the nginx-ingress-controller
+# the hosts section must match the incoming header
+# the annotation allows the nginx-ingress-controller to find and configure the routing
+ingress:
+  enabled: true
+  hosts:
+    - jupyter.example.com
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.allow-http: false
+    # this section is needed as jupyter uses secure websockets (wss) to connect to notebooks between the browser
+    # and the server. without these lines the wss connections were failing with code 400
+    nginx.ingress.kubernetes.io/websocket-services: proxy-public
+    nginx.org/websocket-services: proxy-public
+
+# this process is used to periodically (${every} seconds) check for inactive sessions and terminate the pod after ${timeout} seconds
+# whilst the user has the browser open the inactivity timeout is reset every few seconds so leaving a browser conencted will prevent
+# automatic culling
+cull:
+  enabled: true
+  users: false
+  removeNamedServers: false
+  timeout: 3600
+  every: 300
+  concurrency: 10
+  maxAge: 0
