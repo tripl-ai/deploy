@@ -2,11 +2,12 @@
 
 ## Kubernetes
 
-These examples show how to run against a Kuberetes cluster:
+These examples show how to run against a Kubernetes cluster:
 
-- [kubernetes-argo](https://github.com/tripl-ai/deploy/tree/master/kubernetes-argo) for running on Kubernetes and deploy jobs using [Argo](https://argoproj.github.io/) workflows.
-- [jupyterhub-for-kubernetes](https://github.com/tripl-ai/deploy/tree/master/jupyterhub-for-kubernetes) for running on JupyterHub on Kubernetes to build Arc jobs.
 - [spark-on-k8s-operator](https://github.com/tripl-ai/deploy/tree/master/spark-on-k8s-operator) for running on Kubernetes with the [spark-on-k8s-operator](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator).
+- [kubernetes-argo](https://github.com/tripl-ai/deploy/tree/master/kubernetes-argo) for running on Kubernetes and deploy jobs using [Argo](https://argoproj.github.io/) workflows. Argo allows the definition of dependencies between jobs which can be useful for complex workflows or jobs which require different service-account permissions to execute.
+- [jupyterhub-for-kubernetes](https://github.com/tripl-ai/deploy/tree/master/jupyterhub-for-kubernetes) for how to run JupyterHub on Kubernetes to allow end-users to start their own JupyterLab instances to build Arc jobs.
+
 
 ## AWS
 
